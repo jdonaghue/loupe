@@ -11,6 +11,8 @@ loupe_cls(loupe, {
 			self.data_points = self.data_points.concat(datapoints);
 		}
 
+		self.analyzed_data = loupe_analyze_data(self.data_points);
+
 		return self;
 	}
 });

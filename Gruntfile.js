@@ -25,11 +25,17 @@ module.exports = function(grunt) {
 						'src/core/extend.js',
 						'src/core/cls.js',
 						'src/core/each.js',
+						'src/core/isFunction.js',
 						'src/core/fn.js',
 						'src/core/noop.js',
 						'src/core/loupe.js',
 						'src/core/selector.js',
+						'src/animation/timer.js',
+						'src/animation/linear.js',
+						'src/animation/animate.js',
+						'src/dom/attr.js',
 						'src/dom/create.js',
+						'src/data/analyze.js',
 						'src/data/data.js',
 						'src/data/sync.js',
 						'src/transformations/linear.js',
@@ -81,7 +87,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks("grunt-compare-size");
 
 	// Default task
-	//grunt.registerTask( "default", [ "qunit", "concat", , "uglify", "compare_size" ] );
 	grunt.registerTask( "default", [ "concat", "uglify",  "compare_size" ] );
-
 };

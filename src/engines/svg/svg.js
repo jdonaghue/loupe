@@ -1,10 +1,10 @@
 function loupe_get_map (type) {
 	switch(type) {
 		case 'circle': {
-			return loupe_circle_config_map;
+			return loupe_circle_svg_map;
 		}
 		case 'rect': {
-			return loupe_rect_config_map;	
+			return loupe_rect_svg_map;	
 		}
 	}
 }
@@ -29,11 +29,25 @@ loupe_cls(loupe, {
 						});
 						el.appendChild(svg);
 					}
-					var type = loupe_createEl(loupe_svg_ns, self.animate ? shape.original || shape : shape);
-					svg.appendChild(type);
 
-					if (self.animate) {
+					if (self.animate_on) {
+						var type = loupe_createEl(loupe_svg_ns, shape.original);
+						svg.appendChild(type);
 
+						loupe_each(shape, function(val, prop) {
+							if (prop in {cx: null, cy: null, r: null}) {
+								loupe_animate(type, {
+									prop: prop,
+									start: shape.original[prop],
+									stop: shape[prop],
+									duration: self.animate_duration
+								});
+							}
+						});
+					}
+					else {
+						var type = loupe_createEl(loupe_svg_ns, shape);
+						svg.appendChild(type);
 					}
 				});
 			});

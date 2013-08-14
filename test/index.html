@@ -10,6 +10,7 @@
 					el.setAttribute('style','display: inline-block; width: 200px; height: 200px;');
 					peppy.query('body')[0].appendChild(el);
 				}
+
 				loupe('div')
 					.circle({
 						centerX: 150,
@@ -17,7 +18,7 @@
 						radius: 100,
 						color: 'red',
 						strokeColor: 'black',
-  						stroke:'2'
+						stroke:'2'
 					})
 					.circle({
 						centerX: 10,
@@ -25,11 +26,11 @@
 						radius: 50,
 						color: 'green',
 						strokeColor: 'black',
-  						stroke: '2'
+						stroke: '2'
 					})
 					.data([.5, .2, .8, .4])
-					.transform('linear', ['radius', 'centerX', 'centerY'])
-					//.animate()
+					.transform('linear', { radius: null, centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, centerY: null })
+					.animate({ duration: 300})
 					.draw();
 			}
 		</script>

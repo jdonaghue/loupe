@@ -4,7 +4,7 @@ function loupe_createEl(ns, props) {
 
 	for (var prop in props) {
 		if (prop != 'tag') {
-			el.setAttribute(prop, props[prop]);
+			loupe_attr(el, prop, props[prop]);
 		}
 	}
 	return el;

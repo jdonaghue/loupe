@@ -1,4 +1,4 @@
-function loupe_linear_transform (shape, data, opts) {
+function loupe_linear_transform (shape, data, opts, index) {
 
 	var map;
 
@@ -10,6 +10,11 @@ function loupe_linear_transform (shape, data, opts) {
 	loupe_each(opts, function(val, key) {
 		map = loupe_get_map(shape.tag);
 
-		shape[map[val]] = shape[map[val]] * data; 
+		if (loupe_is_function(val)) {
+			shape[map[key]] = val(shape[map[key]], data, index);
+		}
+		else {
+			shape[map[key]] = shape[map[key]] * data; 
+		}
 	});
 }

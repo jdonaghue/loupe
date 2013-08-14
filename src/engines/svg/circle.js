@@ -1,4 +1,4 @@
-var loupe_circle_config_map = {
+var loupe_circle_svg_map = {
 	centerX: 'cx',
 	centerY: 'cy',
 	radius: 'r',
@@ -17,7 +17,7 @@ loupe_cls(loupe, {
 			};
 
 		for (var prop in props) {
-			config[loupe_circle_config_map[prop]] = props[prop];
+			config[loupe_circle_svg_map[prop]] = props[prop];
 		}		
 
 		self.shapes.push(config);

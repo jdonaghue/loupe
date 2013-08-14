@@ -10,5 +10,6 @@ _win.loupe = function (selector) {
 	L.shapes = [];
 	L.queue = [];
 	L.data_points = [];
+	L.analyzed_data = [];
 	return L;	
 }

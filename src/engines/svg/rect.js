@@ -1,8 +1,9 @@
-var loupe_rect_config_map = {
+var loupe_rect_svg_map = {
 	xOffset: 'cx',
 	yOffset: 'cy',
 	radius: 'r',
 	stroke: 'stroke-width',
+	strokeColor: 'stroke',
 	color: 'fill'
 };
 
@@ -16,7 +17,7 @@ loupe_cls(loupe, {
 			};
 
 		for (var prop in props) {
-			config[loupe_rect_config_map[prop]] = props[prop];
+			config[loupe_rect_svg_map[prop]] = props[prop];
 		}		
 
 		self.shapes.push(config);

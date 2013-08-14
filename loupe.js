@@ -41,6 +41,10 @@ function loupe_each(list, fn) {
 		index++;
 	}
 }
+// Source: src/core/isFunction.js
+function loupe_is_function (fn) {
+	return typeof fn == 'function';
+}
 // Source: src/core/fn.js
 function loupe_fn() {
 	
@@ -61,6 +65,7 @@ _win.loupe = function (selector) {
 	L.shapes = [];
 	L.queue = [];
 	L.data_points = [];
+	L.analyzed_data = [];
 	return L;	
 }
 // Source: src/core/selector.js
@@ -74,6 +79,82 @@ loupe_cls(loupe, {
 		return this;
 	}
 });
+// Source: src/animation/timer.js
+function loupe_start_task (fn, args, scope, interval) {
+	
+	return setInterval(function() {
+		fn.apply(scope, args);
+	}, interval || 10);
+}
+
+function loupe_stop_task (taskId, callback) {
+	clearInterval(taskId);
+
+	if (callback) {
+		callback();
+	}
+}
+// Source: src/animation/linear.js
+function loupe_animation_linear (value) {
+	return value;
+}
+// Source: src/animation/animate.js
+function loupe_get_animation_easing (type) {
+	switch (type) {
+		case 'linear': {
+			return loupe_animation_linear;
+		}
+	}
+	return loupe_animation_linear;
+}
+
+function loupe_animate (el, opts) {
+
+	var movingVal = opts.stop - opts.start,
+		delta = 0,
+		elapsedTime = 0,
+		id = loupe_start_task(
+			function(el, prop, stop) {
+				delta = loupe_get_animation_easing(self.animate_method)(elapsedTime / opts.duration);
+				loupe_attr(el, prop, opts.start + movingVal * delta);
+
+				elapsedTime+=10;
+				if (elapsedTime > opts.duration) {
+					loupe_stop_task(id, opts.callback);
+				}
+			},
+			[el, opts.prop, opts.stop],
+			null,
+			10);
+}
+
+loupe_cls(loupe, {
+
+	animate: function (opts) {
+
+		var self = this;
+
+		self.animate_on = true;
+		self.animate_method = 'linear';
+		self.animate_duration = 200;
+
+		if (opts) {
+			self.animate_method = opts.easing || 'linear';
+			self.animate_properties = opts.props;
+			self.animate_duration = opts.duration || 200;
+		}
+		return self;
+	}
+});
+// Source: src/dom/attr.js
+function loupe_attr (el, key, val, ns) {
+	if (ns) {
+		el.setAttributeNS(ns, key, val + '');
+	}
+	else {
+		el.setAttribute(key, val + '');
+	}
+}
 // Source: src/dom/create.js
 function loupe_createEl(ns, props) {
 
@@ -81,10 +162,15 @@ function loupe_createEl(ns, props) {
 
 	for (var prop in props) {
 		if (prop != 'tag') {
-			el.setAttribute(prop, props[prop]);
+			loupe_attr(el, prop, props[prop]);
 		}
 	}
 	return el;
+}
+// Source: src/data/analyze.js
+function loupe_analyze_data (data) {
+
+	return data;
 }
 // Source: src/data/data.js
 loupe_cls(loupe, {
@@ -100,22 +186,20 @@ loupe_cls(loupe, {
 			self.data_points = self.data_points.concat(datapoints);
 		}
 
+		self.analyzed_data = loupe_analyze_data(self.data_points);
+
 		return self;
 	}
 });
 // Source: src/data/sync.js
-// queue of operations per dom element
-// data
-// dom elements
-// shapes list
 function loupe_sync_data(self) {
 	
 	var dom_queue = [];
 
-	if (self.data_points.length > 0) {
+	if (self.analyzed_data.length > 0) {
 		loupe_each(self.dom, function(d) {
 			var data_queue = [];
-			loupe_each(self.data_points, function(d) {
+			loupe_each(self.analyzed_data, function(d) {
 				var shape_queue = [];
 				loupe_each(self.shapes, function(shape) {
 					var clone = {};
@@ -148,7 +232,7 @@ function loupe_sync_data(self) {
 	self.queue = dom_queue;
 }
 // Source: src/transformations/linear.js
-function loupe_linear_transform (shape, data, opts) {
+function loupe_linear_transform (shape, data, opts, index) {
 
 	var map;
 
@@ -160,7 +244,12 @@ function loupe_linear_transform (shape, data, opts) {
 	loupe_each(opts, function(val, key) {
 		map = loupe_get_map(shape.tag);
 
-		shape[map[val]] = shape[map[val]] * data; 
+		if (loupe_is_function(val)) {
+			shape[map[key]] = val(shape[map[key]], data, index);
+		}
+		else {
+			shape[map[key]] = shape[map[key]] * data; 
+		}
 	});
 }
 // Source: src/transformations/transform.js
@@ -178,7 +267,7 @@ loupe_cls(loupe, {
 
 					switch (mode) {
 						case 'linear': {
-							loupe_linear_transform(shape, self.data_points[index], opts);
+							loupe_linear_transform(shape, self.analyzed_data[index], opts, index);
 							break;
 						}
 					}
@@ -191,7 +280,7 @@ loupe_cls(loupe, {
 	}
 });
 // Source: src/engines/svg/circle.js
-var loupe_circle_config_map = {
+var loupe_circle_svg_map = {
 	centerX: 'cx',
 	centerY: 'cy',
 	radius: 'r',
@@ -210,7 +299,7 @@ loupe_cls(loupe, {
 			};
 
 		for (var prop in props) {
-			config[loupe_circle_config_map[prop]] = props[prop];
+			config[loupe_circle_svg_map[prop]] = props[prop];
 		}		
 
 		self.shapes.push(config);
@@ -221,11 +310,12 @@ loupe_cls(loupe, {
 	}
 });
 // Source: src/engines/svg/rect.js
-var loupe_rect_config_map = {
+var loupe_rect_svg_map = {
 	xOffset: 'cx',
 	yOffset: 'cy',
 	radius: 'r',
 	stroke: 'stroke-width',
+	strokeColor: 'stroke',
 	color: 'fill'
 };
 
@@ -239,7 +329,7 @@ loupe_cls(loupe, {
 			};
 
 		for (var prop in props) {
-			config[loupe_rect_config_map[prop]] = props[prop];
+			config[loupe_rect_svg_map[prop]] = props[prop];
 		}		
 
 		self.shapes.push(config);
@@ -253,10 +343,10 @@ loupe_cls(loupe, {
 function loupe_get_map (type) {
 	switch(type) {
 		case 'circle': {
-			return loupe_circle_config_map;
+			return loupe_circle_svg_map;
 		}
 		case 'rect': {
-			return loupe_rect_config_map;	
+			return loupe_rect_svg_map;	
 		}
 	}
 }
@@ -281,11 +371,25 @@ loupe_cls(loupe, {
 						});
 						el.appendChild(svg);
 					}
-					var type = loupe_createEl(loupe_svg_ns, self.animate ? shape.original || shape : shape);
-					svg.appendChild(type);
 
-					if (self.animate) {
+					if (self.animate_on) {
+						var type = loupe_createEl(loupe_svg_ns, shape.original);
+						svg.appendChild(type);
 
+						loupe_each(shape, function(val, prop) {
+							if (prop in {cx: null, cy: null, r: null}) {
+								loupe_animate(type, {
+									prop: prop,
+									start: shape.original[prop],
+									stop: shape[prop],
+									duration: self.animate_duration
+								});
+							}
+						});
+					}
+					else {
+						var type = loupe_createEl(loupe_svg_ns, shape);
+						svg.appendChild(type);
 					}
 				});
 			});

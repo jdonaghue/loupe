@@ -12,7 +12,7 @@ loupe_cls(loupe, {
 
 					switch (mode) {
 						case 'linear': {
-							loupe_linear_transform(shape, self.data_points[index], opts);
+							loupe_linear_transform(shape, self.analyzed_data[index], opts, index);
 							break;
 						}
 					}

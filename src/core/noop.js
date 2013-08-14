@@ -1,0 +1,1 @@
+function loupe_noop() {}

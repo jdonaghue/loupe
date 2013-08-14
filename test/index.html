@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../../Peppy/peppy.js"></script>
+		<script src="../loupe.js"></script>
+		<script>
+			window.onload = function() {
+				for (var i=0; i < 100; i++) {
+					var el = document.createElement('div');
+					el.setAttribute('style','display: inline-block; width: 200px; height: 200px;');
+					peppy.query('body')[0].appendChild(el);
+				}
+				loupe('div')
+					.circle({
+						centerX: 150,
+						centerY: 100,
+						radius: 100,
+						color: 'red',
+						strokeColor: 'black',
+  						stroke:'2'
+					})
+					.circle({
+						centerX: 10,
+						centerY: 10,
+						radius: 50,
+						color: 'green',
+						strokeColor: 'black',
+  						stroke: '2'
+					})
+					.data([.5, .2, .8, .4])
+					.transform('linear', ['radius', 'centerX', 'centerY'])
+					//.animate()
+					.draw();
+			}
+		</script>
+	</head>
+	<body>	
+	</body>
+</html>

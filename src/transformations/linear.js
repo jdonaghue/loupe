@@ -4,7 +4,9 @@ function loupe_linear_transform (shape, data, opts, index) {
 
 	shape.original = {};
 	loupe_each(shape, function(val, key) {
-		shape.original[key] = val;
+		if (key != 'other') {
+			shape.original[key] = val;
+		}
 	});
 
 	loupe_each(opts, function(val, key) {
@@ -14,7 +16,7 @@ function loupe_linear_transform (shape, data, opts, index) {
 			shape[map[key]] = val(shape[map[key]], data, index);
 		}
 		else {
-			shape[map[key]] = shape[map[key]] * data; 
+			shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 
 		}
 	});
 }

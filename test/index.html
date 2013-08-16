@@ -5,7 +5,7 @@
 		<script src="../loupe.js"></script>
 		<script>
 			window.onload = function() {
-				for (var i=0; i < 100; i++) {
+				for (var i=0; i < 25; i++) {
 					var el = document.createElement('div');
 					el.setAttribute('style','display: inline-block; width: 200px; height: 200px;');
 					peppy.query('body')[0].appendChild(el);
@@ -18,7 +18,9 @@
 						radius: 100,
 						color: 'red',
 						strokeColor: 'black',
-						stroke:'2'
+						stroke:'2',
+						animate: true,
+						animate_duration: 300
 					})
 					.circle({
 						centerX: 10,
@@ -26,11 +28,35 @@
 						radius: 50,
 						color: 'green',
 						strokeColor: 'black',
-						stroke: '2'
+						stroke: '2',
+						animate: true,
+						animate_duration: 1000
+					})
+					.path({
+						strokeColor: 'black',
+						stroke: '2',
+						color: 'white',
+						d: 'M75,75L75,75A50,50,0,0,0,10,10Z',
+						animate: true,
+						animate_duration: 1500
+					})
+					.path({
+						strokeColor: 'black',
+						stroke: '2',
+						color: 'yellow',
+						d: 'M150,150L150,150A50,50,0,0,0,80,80Z',
+						animate: true,
+						animate_duration: 2000
 					})
 					.data([.5, .2, .8, .4])
-					.transform('linear', { radius: null, centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, centerY: null })
-					.animate({ duration: 300})
+					.transform('linear', { 
+						radius: null, 
+						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 
+						centerY: null, 
+						d: null,
+						color: null
+					})
+					//.animate({ duration: 300, synchronous: false})
 					.draw();
 			}
 		</script>

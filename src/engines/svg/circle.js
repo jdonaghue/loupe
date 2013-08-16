@@ -1,11 +1,8 @@
-var loupe_circle_svg_map = {
+var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
 	centerY: 'cy',
-	radius: 'r',
-	stroke: 'stroke-width',
-	strokeColor: 'stroke',
-	color: 'fill'
-};
+	radius: 'r'
+}, loupe_shape);
 
 loupe_cls(loupe, {
 
@@ -14,10 +11,17 @@ loupe_cls(loupe, {
 		var self = this,
 			config = {
 				tag: 'circle',
+				other: {}
 			};
 
 		for (var prop in props) {
-			config[loupe_circle_svg_map[prop]] = props[prop];
+			var mapped_prop = loupe_circle_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
 		}		
 
 		self.shapes.push(config);

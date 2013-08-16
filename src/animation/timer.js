@@ -5,10 +5,10 @@ function loupe_start_task (fn, args, scope, interval) {
 	}, interval || 10);
 }
 
-function loupe_stop_task (taskId, callback) {
+function loupe_stop_task (taskId, callback, callback_args) {
 	clearInterval(taskId);
 
 	if (callback) {
-		callback();
+		callback.apply(null, callback_args);
 	}
 }

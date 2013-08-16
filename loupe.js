@@ -79,6 +79,282 @@ loupe_cls(loupe, {
 		return this;
 	}
 });
+// Source: src/math/math.js
+function loupe_get_add (type) {
+	
+	switch (type) {
+		case 'd': {
+			return loupe_d_add;
+		}
+		case 'fill': {
+			return loupe_color_add;	
+		} 
+		default: {
+			return loupe_numeric_add;
+		}
+	}
+}
+
+function loupe_get_sub (type) {
+	
+	switch (type) {
+		case 'd': {
+			return loupe_d_sub;
+		}
+		case 'fill': {
+			return loupe_color_sub;	
+		}
+		default: {
+			return loupe_numeric_sub;
+		}
+	}
+}
+
+function loupe_get_mult (type) {
+		
+	switch (type) {
+		case 'd': {
+			return loupe_d_mult;
+		}
+		case 'fill': {
+			return loupe_color_mult;	
+		}
+		default: {
+			return loupe_numeric_mult;
+		}
+	}
+}
+
+function loupe_get_divide (type) {
+
+	switch (type) {
+		case 'd': {
+			return loupe_d_divide;
+		}
+		case 'fill': {
+			return loupe_color_divide;	
+		}
+		default: {
+			return loupe_numeric_divide;
+		}
+	}
+}
+// Source: src/math/d.js
+function loupe_d_add (d, dx) {
+	
+	return loupe_d_math(d, dx, 'add');
+}
+
+function loupe_d_sub (d, dx) {
+	
+	return loupe_d_math(d, dx, 'sub');
+}
+
+function loupe_d_mult (d, dx) {
+	
+	return loupe_d_math(d, dx, 'mult');
+}
+
+function loupe_d_divide (d, dx) {
+	
+	return loupe_d_math(d, dx, 'divide');
+}
+
+function loupe_d_math (d, dx, op) {
+
+	if (d) {
+		var args = d.split(/[a-zA-Z]+/g),
+			operations = d.split(/[0-9,.\-]+/g);
+
+		args.shift();
+		args.pop();
+
+		if (!isNaN(dx)) {
+
+			for(var i=0, len=args.length; i<len; i++) {
+				var tmp = args[i].split(',');
+				for(var j=0; j<tmp.length; j++) {
+					if (op == 'add') {
+						tmp[j] = (tmp[j] *1) + (dx * 1);
+					}
+					else if (op == 'sub') {
+						tmp[j] = (tmp[j] * 1) - (dx * 1);
+					}
+					else if (op == 'mult') {
+						tmp[j] = tmp[j] * dx;
+					}
+					else if (op == 'divide') {
+						tmp[j] = tmp[j] / dx;
+					}
+				}
+				args[i] = tmp.join(',');
+			}
+		}
+		else {
+			var argsDx = dx.split(/[a-zA-Z]+/g),
+				operationsDx = dx.split(/[0-9,.\-]+/g);
+
+			argsDx.shift();
+			argsDx.pop();
+
+			if (argsDx.length != args.length || operationsDx.length != operations.length) {
+				return d;
+			}
+
+			for(var i=0, len=args.length; i<len; i++) {
+				var tmp = args[i].split(','),
+					tmpDx = argsDx[i].split(',');
+
+				if (tmp.length != tmpDx.length) {
+					return d;
+				}
+
+				for(var j=0; j<tmp.length; j++) {
+					if (op == 'add') {
+						tmp[j] = (tmp[j] *1) + (tmpDx[j] *1);
+					}
+					else if (op == 'sub') {
+						tmp[j] = (tmp[j] *1) - (tmpDx[j] *1);
+					}
+					else if (op == 'mult') {
+						tmp[j] = tmp[j] * tmpDx[j];
+					}
+					else if (op == 'divide') {
+						tmp[j] = tmp[j] / tmpDx[j];
+					}
+				}
+				args[i] = tmp.join(',');
+			}
+		}
+
+
+		d = '';
+		for(var z=0,zlen=operations.length; z<zlen; z++) {
+			d += operations[z] + (args.length > 0 ? args.shift() : '');
+		}
+	}
+
+	return d;
+}
+// Source: src/math/color.js
+var loupe_color_to_hex_map = {
+	white: '#FFFFFF',
+	red: '#FF0000',
+	black: '#000000',
+	green: '#008000',
+	yellow: '#ffff00'
+}
+
+function loupe_color_add (d, dx) {
+
+	return loupe_color_math(d, dx, 'add');	
+}
+
+function loupe_color_sub (d, dx) {
+
+	return loupe_color_math(d, dx, 'sub');	
+}
+
+function loupe_color_mult (d, dx) {
+	
+	return loupe_color_math(d, dx, 'mult');
+}
+
+function loupe_color_divide (d, dx) {
+	
+	return loupe_color_math(d, dx, 'divide');
+}
+
+function loupe_color_math (d, dx, op) {
+
+	var rbg;
+
+	d = loupe_color_to_hex_map[d] || d;
+	dx = loupe_color_to_hex_map[dx] || dx;
+
+	if (d.indexOf('rgb') == 0) {
+		d = d.substring(4, d.length - 1);
+		d = d.split(',');
+	}
+	else {
+		d = loupe_hex_to_rgb_values(d);
+	}
+
+	if (isNaN(dx)) {
+		if (dx.indexOf('rgb') == 0) {
+			dx = dx.substring(4, dx.length - 1);
+			dx = dx.split(',');
+		}
+		else {
+			dx = loupe_hex_to_rgb_values(dx);
+		}
+	}
+	else {
+		dx = [dx, dx, dx];
+	}
+
+	if (op == 'add') {
+		d[0] = (d[0] * 1) + (dx[0] * 1);
+		d[1] = (d[1] * 1) + (dx[1] * 1);
+		d[2] = (d[2] * 1) + (dx[2] * 1);
+	}
+	else if (op == 'sub') {
+		d[0] = (d[0] * 1) - (dx[0] * 1);
+		d[1] = (d[1] * 1) - (dx[1] * 1);
+		d[2] = (d[2] * 1) - (dx[2] * 1);
+	}
+	else if (op == 'mult') {
+		d[0] = d[0] * dx[0];
+		d[1] = d[1] * dx[1];
+		d[2] = d[2] * dx[2];
+	}
+	else if (op == 'divide') {
+		d[0] = d[0] / dx[0];
+		d[1] = d[1] / dx[1];
+		d[2] = d[2] / dx[2];
+	}
+
+	d[0] = Math.round(d[0]);
+	d[1] = Math.round(d[1]);
+	d[2] = Math.round(d[2]);
+
+	rgb = 'rgb(' + d.join(',') + ')';
+
+	return rgb;
+}
+
+function loupe_hex_to_rgb_values (hex) {
+
+	var rgb = hex.match(/([a-zA-Z0-9]{1})/g);
+
+	if (rgb.length == 3) {
+		rgb.splice(1, 0, rgb[0]); // FF0b
+		rgb.splice(2, 0, rgb[2]); // FF00b
+		rgb.splice(4, 0, rgb[4]); // FF00bb
+	}
+
+	var r = (parseInt(rgb[0], 16) + 1) * (parseInt(rgb[1], 16) + 1),
+		g = (parseInt(rgb[2], 16) + 1) * (parseInt(rgb[3], 16) + 1),
+		b = (parseInt(rgb[4], 16) + 1) * (parseInt(rgb[5], 16) + 1);
+
+	return [r,g,b];
+}
+// Source: src/math/numeric.js
+function loupe_numeric_add (a, b) {
+	return a + b;
+}
+
+function loupe_numeric_sub (a, b) {
+	return a - b;
+}
+
+function loupe_numeric_mult (a, b) {
+	return a * b;
+}
+
+function loupe_numeric_divide (a, b) {
+	return a / b;
+}
 // Source: src/animation/timer.js
 function loupe_start_task (fn, args, scope, interval) {
 	
@@ -87,11 +363,11 @@ function loupe_start_task (fn, args, scope, interval) {
 	}, interval || 10);
 }
 
-function loupe_stop_task (taskId, callback) {
+function loupe_stop_task (taskId, callback, callback_args) {
 	clearInterval(taskId);
 
 	if (callback) {
-		callback();
+		callback.apply(null, callback_args);
 	}
 }
 // Source: src/animation/linear.js
@@ -110,17 +386,20 @@ function loupe_get_animation_easing (type) {
 
 function loupe_animate (el, opts) {
 
-	var movingVal = opts.stop - opts.start,
+	var add = loupe_get_add(opts.prop),
+		sub = loupe_get_sub(opts.prop),
+		mult = loupe_get_mult(opts.prop),
+		movingVal = sub(opts.stop, opts.start),
 		delta = 0,
 		elapsedTime = 0,
 		id = loupe_start_task(
 			function(el, prop, stop) {
-				delta = loupe_get_animation_easing(self.animate_method)(elapsedTime / opts.duration);
-				loupe_attr(el, prop, opts.start + movingVal * delta);
+				delta = loupe_get_animation_easing(self.animate_method || opts.animate_method)(elapsedTime / opts.duration);
+				loupe_attr(el, prop, add(opts.start, mult(movingVal, delta)));
 
 				elapsedTime+=10;
 				if (elapsedTime > opts.duration) {
-					loupe_stop_task(id, opts.callback);
+					loupe_stop_task(id, opts.callback, opts.callback_args);
 				}
 			},
 			[el, opts.prop, opts.stop],
@@ -139,6 +418,7 @@ loupe_cls(loupe, {
 		self.animate_duration = 200;
 
 		if (opts) {
+			self.animate_synchronous = opts.synchronous || false;
 			self.animate_method = opts.easing || 'linear';
 			self.animate_properties = opts.props;
 			self.animate_duration = opts.duration || 200;
@@ -161,7 +441,7 @@ function loupe_createEl(ns, props) {
 	var el = _doc.createElementNS(ns, props.tag);
 
 	for (var prop in props) {
-		if (prop != 'tag') {
+		if (prop != 'tag' && prop != 'other' && prop != 'original') {
 			loupe_attr(el, prop, props[prop]);
 		}
 	}
@@ -238,7 +518,9 @@ function loupe_linear_transform (shape, data, opts, index) {
 
 	shape.original = {};
 	loupe_each(shape, function(val, key) {
-		shape.original[key] = val;
+		if (key != 'other') {
+			shape.original[key] = val;
+		}
 	});
 
 	loupe_each(opts, function(val, key) {
@@ -248,7 +530,7 @@ function loupe_linear_transform (shape, data, opts, index) {
 			shape[map[key]] = val(shape[map[key]], data, index);
 		}
 		else {
-			shape[map[key]] = shape[map[key]] * data; 
+			shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 
 		}
 	});
 }
@@ -279,15 +561,18 @@ loupe_cls(loupe, {
 		return self;
 	}
 });
-// Source: src/engines/svg/circle.js
-var loupe_circle_svg_map = {
-	centerX: 'cx',
-	centerY: 'cy',
-	radius: 'r',
+// Source: src/engines/svg/shape.js
+var loupe_shape = {
 	stroke: 'stroke-width',
 	strokeColor: 'stroke',
 	color: 'fill'
-};
+}	
+// Source: src/engines/svg/circle.js
+var loupe_circle_svg_map = loupe_extend({
+	centerX: 'cx',
+	centerY: 'cy',
+	radius: 'r'
+}, loupe_shape);
 
 loupe_cls(loupe, {
 
@@ -296,10 +581,17 @@ loupe_cls(loupe, {
 		var self = this,
 			config = {
 				tag: 'circle',
+				other: {}
 			};
 
 		for (var prop in props) {
-			config[loupe_circle_svg_map[prop]] = props[prop];
+			var mapped_prop = loupe_circle_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
 		}		
 
 		self.shapes.push(config);
@@ -310,14 +602,11 @@ loupe_cls(loupe, {
 	}
 });
 // Source: src/engines/svg/rect.js
-var loupe_rect_svg_map = {
+var loupe_rect_svg_map = loupe_extend({
 	xOffset: 'cx',
 	yOffset: 'cy',
-	radius: 'r',
-	stroke: 'stroke-width',
-	strokeColor: 'stroke',
-	color: 'fill'
-};
+	radius: 'r'
+}, loupe_shape);
 
 loupe_cls(loupe, {
 
@@ -326,16 +615,55 @@ loupe_cls(loupe, {
 		var self = this,
 			config = {
 				tag: 'rect',
+				other: {}
 			};
 
 		for (var prop in props) {
-			config[loupe_rect_svg_map[prop]] = props[prop];
+			var mapped_prop = loupe_rect_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
 		}		
 
 		self.shapes.push(config);
 
 		loupe_sync_data(self);
 
+		return self;
+	}
+});
+// Source: src/engines/svg/path.js
+var loupe_path_svg_map = loupe_extend({
+	d: 'd'
+}, loupe_shape);
+
+loupe_cls(loupe, {
+
+	path: function (props) {
+
+		var self = this,
+			config = {
+				tag: 'path',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_path_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}		
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
 		return self;
 	}
 });
@@ -348,6 +676,9 @@ function loupe_get_map (type) {
 		case 'rect': {
 			return loupe_rect_svg_map;	
 		}
+		case 'path': {
+			return loupe_path_svg_map;
+		}
 	}
 }
 
@@ -358,6 +689,9 @@ loupe_cls(loupe, {
 		var self = this;
 
 		loupe_each(self.queue, function (shape_queue, key, index) {
+			var anim_queue = [],
+				anim_element = null;
+
 			loupe_each(shape_queue, function (shapes) {
 				loupe_each(shapes, function(shape) {
 
@@ -372,20 +706,50 @@ loupe_cls(loupe, {
 						el.appendChild(svg);
 					}
 
-					if (self.animate_on) {
+					if (self.animate_on || shape.other.animate) {
 						var type = loupe_createEl(loupe_svg_ns, shape.original);
 						svg.appendChild(type);
 
-						loupe_each(shape, function(val, prop) {
-							if (prop in {cx: null, cy: null, r: null}) {
-								loupe_animate(type, {
-									prop: prop,
-									start: shape.original[prop],
-									stop: shape[prop],
-									duration: self.animate_duration
-								});
-							}
-						});
+						// if (!anim_element) {
+						// 	anim_element = type;
+						// }
+
+						// if (self.animate_synchronous || shape.animate_synchronous) {
+						// 	loupe_each(shape, function(val, prop) {
+						// 		if (prop in {cx: null, cy: null, r: null}) {
+						// 			anim_queue.push({
+						// 				prop: prop,
+						// 				start: shape.original[prop],
+						// 				stop: shape[prop],
+						// 				duration: self.animate_duration || shape.animate_duration
+						// 			});
+
+						// 			var last = null;
+						// 			loupe_each(anim_queue, function(anim) {
+						// 				if (last != null) {
+						// 					last.callback = function(t, l) {
+						// 						loupe_animate(t, l);
+						// 					};
+						// 					last.callback_args = [type, last];										
+						// 				}
+						// 				last = anim;
+						// 			});
+						// 		}
+						// 	});
+						// }
+						// else {
+							loupe_each(shape, function(val, prop) {
+								if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
+									loupe_animate(type, {
+										prop: prop,
+										start: shape.original[prop],
+										stop: shape[prop],
+										duration: self.animate_duration || shape.other.animate_duration || 200,
+										animate_method: shape.other.animate_method
+									});
+								}
+							});
+						//}
 					}
 					else {
 						var type = loupe_createEl(loupe_svg_ns, shape);
@@ -393,6 +757,10 @@ loupe_cls(loupe, {
 					}
 				});
 			});
+
+			// if (self.animate_on && self.animate_synchronous && anim_queue.length > 0) {
+			// 	loupe_animate(anim_element, anim_queue[0]);
+			// }
 		});
 
 		return self;

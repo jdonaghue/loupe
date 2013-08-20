@@ -22,7 +22,8 @@ function loupe_d_math (d, dx, op) {
 
 	if (d) {
 		var args = d.split(/[a-zA-Z]+/g),
-			operations = d.split(/[0-9,.\-]+/g);
+			operations = d.split(/[0-9,.\-]+/g),
+			tmpOperations = d.split(/[0-9,.\-]+/g);
 
 		args.shift();
 		args.pop();
@@ -30,7 +31,9 @@ function loupe_d_math (d, dx, op) {
 		if (!isNaN(dx)) {
 
 			for(var i=0, len=args.length; i<len; i++) {
-				var tmp = args[i].split(',');
+				var tmp = args[i].split(','),
+					operator = tmpOperations.shift().toUpperCase();
+				
 				for(var j=0; j<tmp.length; j++) {
 					if (op == 'add') {
 						tmp[j] = (tmp[j] *1) + (dx * 1);
@@ -43,6 +46,11 @@ function loupe_d_math (d, dx, op) {
 					}
 					else if (op == 'divide') {
 						tmp[j] = tmp[j] / dx;
+					}
+					
+
+					if (operator == 'A' && (j == 3 || j == 4)) {
+						tmp[j] = tmp[j] >= 0.5 ? 1 : 0;
 					}
 				}
 				args[i] = tmp.join(',');
@@ -61,13 +69,15 @@ function loupe_d_math (d, dx, op) {
 
 			for(var i=0, len=args.length; i<len; i++) {
 				var tmp = args[i].split(','),
-					tmpDx = argsDx[i].split(',');
+					tmpDx = argsDx[i].split(','),
+					operator = tmpOperations.shift().toUpperCase();
 
 				if (tmp.length != tmpDx.length) {
 					return d;
 				}
 
 				for(var j=0; j<tmp.length; j++) {
+
 					if (op == 'add') {
 						tmp[j] = (tmp[j] *1) + (tmpDx[j] *1);
 					}
@@ -80,11 +90,14 @@ function loupe_d_math (d, dx, op) {
 					else if (op == 'divide') {
 						tmp[j] = tmp[j] / tmpDx[j];
 					}
+
+					if (operator == 'A' && (j == 3 || j == 4)) {
+						tmp[j] = tmp[j] >= 0.5 ? 1 : 0;
+					}
 				}
 				args[i] = tmp.join(',');
 			}
 		}
-
 
 		d = '';
 		for(var z=0,zlen=operations.length; z<zlen; z++) {

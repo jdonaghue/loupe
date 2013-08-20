@@ -79,6 +79,54 @@ loupe_cls(loupe, {
 		return this;
 	}
 });
+// Source: src/event/event.js
+function loupe_event_bind (el, type, fn, args, scope) {
+
+	if (el.addEventListener) {
+		el.addEventListener(type, fn, false);
+	}
+	else {
+		el.attachEvent(type, fn)
+	}
+}
+
+function loupe_event_unbind (el, type, fn) {
+
+	if (el.removeEventListener) {
+
+	}
+	else {
+
+	}
+}
+
+loupe_cls(loupe, {
+
+	on: function () {
+
+	},
+
+	un: function () {
+
+	}
+});
+// Source: src/color/hexMap.js
+var loupe_color_to_hex_map = {
+	white: '#FFFFFF',
+	red: '#FF0000',
+	black: '#000000',
+	green: '#008000',
+	yellow: '#ffff00',
+	blue: '#0000ff'
+}
+// Source: src/color/random.js
+function loupe_random_color (seed) {
+	var r = Math.round(Math.random() * 256),
+		g = Math.round(Math.random() * 256),
+		b = Math.round(Math.random() * 256);
+
+	return 'rgb(' + r + ',' + g + ',' + b + ')';
+}
 // Source: src/math/math.js
 function loupe_get_add (type) {
 	
@@ -89,6 +137,9 @@ function loupe_get_add (type) {
 		case 'fill': {
 			return loupe_color_add;	
 		} 
+		case 'transform': {
+			return loupe_transform_add
+		}	
 		default: {
 			return loupe_numeric_add;
 		}
@@ -104,6 +155,9 @@ function loupe_get_sub (type) {
 		case 'fill': {
 			return loupe_color_sub;	
 		}
+		case 'transform': {
+			return loupe_transform_sub;
+		}	
 		default: {
 			return loupe_numeric_sub;
 		}
@@ -119,6 +173,9 @@ function loupe_get_mult (type) {
 		case 'fill': {
 			return loupe_color_mult;	
 		}
+		case 'transform': {
+			return loupe_transform_mult;
+		}	
 		default: {
 			return loupe_numeric_mult;
 		}
@@ -134,6 +191,9 @@ function loupe_get_divide (type) {
 		case 'fill': {
 			return loupe_color_divide;	
 		}
+		case 'transform': {
+			return loupe_transform_divide;
+		}	
 		default: {
 			return loupe_numeric_divide;
 		}
@@ -164,7 +224,8 @@ function loupe_d_math (d, dx, op) {
 
 	if (d) {
 		var args = d.split(/[a-zA-Z]+/g),
-			operations = d.split(/[0-9,.\-]+/g);
+			operations = d.split(/[0-9,.\-]+/g),
+			tmpOperations = d.split(/[0-9,.\-]+/g);
 
 		args.shift();
 		args.pop();
@@ -172,7 +233,9 @@ function loupe_d_math (d, dx, op) {
 		if (!isNaN(dx)) {
 
 			for(var i=0, len=args.length; i<len; i++) {
-				var tmp = args[i].split(',');
+				var tmp = args[i].split(','),
+					operator = tmpOperations.shift().toUpperCase();
+				
 				for(var j=0; j<tmp.length; j++) {
 					if (op == 'add') {
 						tmp[j] = (tmp[j] *1) + (dx * 1);
@@ -185,6 +248,11 @@ function loupe_d_math (d, dx, op) {
 					}
 					else if (op == 'divide') {
 						tmp[j] = tmp[j] / dx;
+					}
+					
+
+					if (operator == 'A' && (j == 3 || j == 4)) {
+						tmp[j] = tmp[j] >= 0.5 ? 1 : 0;
 					}
 				}
 				args[i] = tmp.join(',');
@@ -203,13 +271,15 @@ function loupe_d_math (d, dx, op) {
 
 			for(var i=0, len=args.length; i<len; i++) {
 				var tmp = args[i].split(','),
-					tmpDx = argsDx[i].split(',');
+					tmpDx = argsDx[i].split(','),
+					operator = tmpOperations.shift().toUpperCase();
 
 				if (tmp.length != tmpDx.length) {
 					return d;
 				}
 
 				for(var j=0; j<tmp.length; j++) {
+
 					if (op == 'add') {
 						tmp[j] = (tmp[j] *1) + (tmpDx[j] *1);
 					}
@@ -222,11 +292,14 @@ function loupe_d_math (d, dx, op) {
 					else if (op == 'divide') {
 						tmp[j] = tmp[j] / tmpDx[j];
 					}
+
+					if (operator == 'A' && (j == 3 || j == 4)) {
+						tmp[j] = tmp[j] >= 0.5 ? 1 : 0;
+					}
 				}
 				args[i] = tmp.join(',');
 			}
 		}
-
 
 		d = '';
 		for(var z=0,zlen=operations.length; z<zlen; z++) {
@@ -237,14 +310,6 @@ function loupe_d_math (d, dx, op) {
 	return d;
 }
 // Source: src/math/color.js
-var loupe_color_to_hex_map = {
-	white: '#FFFFFF',
-	red: '#FF0000',
-	black: '#000000',
-	green: '#008000',
-	yellow: '#ffff00'
-}
-
 function loupe_color_add (d, dx) {
 
 	return loupe_color_math(d, dx, 'add');	
@@ -339,6 +404,74 @@ function loupe_hex_to_rgb_values (hex) {
 
 	return [r,g,b];
 }
+// Source: src/math/transform.js
+function loupe_transform_add (d, dx) {
+
+	return loupe_transform_math(d, dx, 'add');
+}
+
+function loupe_transform_sub (d, dx) {
+
+	return loupe_transform_math(d, dx, 'sub');	
+}
+
+function loupe_transform_mult (d, dx) {
+	
+	return loupe_transform_math(d, dx, 'mult');
+}
+
+function loupe_transform_divide (d, dx) {
+
+	return loupe_transform_math(d, dx, 'divide');
+}
+
+function loupe_transform_math(d, dx, op) {
+
+	var type = d.substring(0, d.indexOf('(')),
+		body = d.substring(d.indexOf('(') + 1, d.length - 1);
+
+	body = body.split(',');
+
+	if (!isNaN(dx)) {
+		for(var i=0, ilen=body.length; i<ilen; i++) {
+			if (op == 'add') {
+				body[i] = (body[i] * 1) + dx;
+			}
+			else if (op == 'sub') {
+				body[i] = (body[i] * 1) - dx;
+			}
+			else if (op == 'mult') {
+				body[i] = body[i]  * dx;
+			}
+			else if (op == 'divide') {
+				body[i] = body[i] / dx;
+			}
+		}
+	}
+	else {
+		var dxType = dx.substring(0, dx.indexOf('(')),
+			dxBody = dx.substring(dx.indexOf('(') + 1, dx.length - 1);
+
+		dxBody = dxBody.split(',');
+
+		for(var i=0, ilen=body.length; i<ilen; i++) {
+			if (op == 'add') {	
+				body[i] = (body[i] * 1) + (dxBody[i] * 1);
+			}
+			else if (op == 'sub') {
+				body[i] = (body[i] * 1) - (dxBody[i] * 1);
+			}
+			else if (op == 'mult') {
+				body[i] = body[i]  * dxBody[i];
+			}
+			else if (op == 'divide') {
+				body[i] = body[i] / dxBody[i];
+			}
+		}
+	}
+
+	return type + '(' + body.join(',') + ')';
+}
 // Source: src/math/numeric.js
 function loupe_numeric_add (a, b) {
 	return a + b;
@@ -405,6 +538,8 @@ function loupe_animate (el, opts) {
 			[el, opts.prop, opts.stop],
 			null,
 			10);
+
+	return id;
 }
 
 loupe_cls(loupe, {
@@ -428,11 +563,30 @@ loupe_cls(loupe, {
 });
 // Source: src/dom/attr.js
 function loupe_attr (el, key, val, ns) {
-	if (ns) {
-		el.setAttributeNS(ns, key, val + '');
+	if (val) {
+		if (ns) {
+			el.setAttributeNS(ns, key, val + '');
+		}
+		else {
+			el.setAttribute(key, val + '');
+		}
 	}
 	else {
-		el.setAttribute(key, val + '');
+		if (ns) {
+			return el.getAttributeNS(ns, key);
+		}
+		else {
+			return el.getAttribute(key);
+		}	
+	}
+}
+
+function loupe_remove_attr (el, key, ns) {
+	if (ns) {
+		el.removeAttributeNS(ns, key);
+	}
+	else {
+		el.removeAttribute(key);
 	}
 }
 // Source: src/dom/create.js
@@ -448,7 +602,20 @@ function loupe_createEl(ns, props) {
 	return el;
 }
 // Source: src/data/analyze.js
-function loupe_analyze_data (data) {
+function loupe_analyze_data (data, reader) {
+
+	data.metrics = {};
+	data.metrics.sum = 0;
+
+	reader = typeof reader == 'function' ? reader : function(a) { return a };
+
+	loupe_each(data, function(val, key) {
+		if (key != 'metrics') {
+			data.metrics.sum += reader(val);
+		}
+	});
+
+	data.metrics.avg = data.metrics.total / data.length;
 
 	return data;
 }
@@ -459,14 +626,15 @@ loupe_cls(loupe, {
 		
 		var self = this;
 
-		if (opts && opts.replace) {
+		opts = opts || {};
+		if (opts.replace) {
 			self.data_points = datapoints;	
 		}
 		else {
 			self.data_points = self.data_points.concat(datapoints);
 		}
 
-		self.analyzed_data = loupe_analyze_data(self.data_points);
+		self.analyzed_data = loupe_analyze_data(self.data_points, opts.reader);
 
 		return self;
 	}
@@ -479,14 +647,21 @@ function loupe_sync_data(self) {
 	if (self.analyzed_data.length > 0) {
 		loupe_each(self.dom, function(d) {
 			var data_queue = [];
-			loupe_each(self.analyzed_data, function(d) {
+			loupe_each(self.shapes, function(shape) {
 				var shape_queue = [];
-				loupe_each(self.shapes, function(shape) {
-					var clone = {};
-					loupe_each(shape, function(val, key) {
-						clone[key] = val;
-					});
-					shape_queue.push(clone);
+				loupe_each(self.analyzed_data, function(d, dKey) {
+					if (dKey != 'metrics' && dKey != 'length') {
+						var clone = {};
+						loupe_each(shape, function(val, key) {
+							if (typeof val == 'object') {
+								clone[key] = loupe_extend({}, val);
+							}
+							else {
+								clone[key] = val;
+							}
+						});
+						shape_queue.push(clone);
+					}
 				});
 				data_queue.push(shape_queue);
 			});
@@ -500,7 +675,12 @@ function loupe_sync_data(self) {
 			loupe_each(self.shapes, function(shape) {
 				var clone = {};
 				loupe_each(shape, function(val, key) {
-					clone[key] = val;
+					if (typeof val == 'object') {
+						clone[key] = loupe_extend({}, val);
+					}
+					else {
+						clone[key] = val;
+					}
 				});
 				shape_queue.push(clone);
 			});
@@ -512,47 +692,55 @@ function loupe_sync_data(self) {
 	self.queue = dom_queue;
 }
 // Source: src/transformations/linear.js
-function loupe_linear_transform (shape, data, opts, index) {
+function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, index) {
 
 	var map;
 
-	shape.original = {};
+	shape.from = shape.from || {};
 	loupe_each(shape, function(val, key) {
-		if (key != 'other') {
-			shape.original[key] = val;
+		if (key != 'other' && key != 'from') {
+			shape.from[key] = shape.from[key] || val;
 		}
 	});
 
-	loupe_each(opts, function(val, key) {
-		map = loupe_get_map(shape.tag);
+	if (shape._tag == 'pie') {
+		shape = loupe_path_to_pie(shape, prevShape, data, analyzed_data, index);
+	}
+	else { // for basic shapes
+		loupe_each(opts, function(val, key) {
+			map = loupe_get_map(shape.tag);
 
-		if (loupe_is_function(val)) {
-			shape[map[key]] = val(shape[map[key]], data, index);
-		}
-		else {
-			shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 
-		}
-	});
+			if (loupe_is_function(val)) {
+				shape[map[key]] = val(shape[map[key]], data, index);
+			}
+			else {
+				shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 
+			}
+		});
+	}
 }
 // Source: src/transformations/transform.js
 loupe_cls(loupe, {
 
 	transform: function (mode, opts) {
 
-		var self = this;
+		var self = this,
+			prevShape = {};
 
 		loupe_sync_data(self);
 
 		loupe_each(self.queue, function(shapes_queue) {
-			loupe_each(shapes_queue, function(shapes, key, index) {
-				loupe_each(shapes, function(shape) {
+			loupe_each(shapes_queue, function(shapes) {
+				loupe_each(shapes, function(shape, key, index) {
 
 					switch (mode) {
 						case 'linear': {
-							loupe_linear_transform(shape, self.analyzed_data[index], opts, index);
+							loupe_linear_transform(shape, prevShape[shape._tag || shape.tag], self.analyzed_data[index], self.analyzed_data, opts, index);
 							break;
 						}
 					}
+
+					prevShape[shape._tag || shape.tag] = shape;
 				});
 			});
 		});
@@ -589,6 +777,9 @@ loupe_cls(loupe, {
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
 			else {
 				config.other[prop] = props[prop];
 			}
@@ -623,6 +814,9 @@ loupe_cls(loupe, {
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
 			else {
 				config.other[prop] = props[prop];
 			}
@@ -637,6 +831,9 @@ loupe_cls(loupe, {
 });
 // Source: src/engines/svg/path.js
 var loupe_path_svg_map = loupe_extend({
+	centerX: 'cx',
+	centerY: 'cy',
+	radius: 'r',
 	d: 'd'
 }, loupe_shape);
 
@@ -655,6 +852,9 @@ loupe_cls(loupe, {
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
 			else {
 				config.other[prop] = props[prop];
 			}
@@ -667,6 +867,118 @@ loupe_cls(loupe, {
 		return self;
 	}
 });
+// Source: src/engines/svg/pie.js
+var loupe_pie_svg_map = loupe_extend({
+	centerX: 'cx',
+	centerY: 'cy',
+	radius: 'r',
+	d: 'd'
+}, loupe_shape);
+
+function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
+
+	var pi = Math.PI,
+		rad = pi / 180,
+		r = shape.r,
+		cx = shape.cx,
+		cy = shape.cy,
+		angleStart = prevShape && prevShape.angleEnd ? prevShape.angleEnd : 0,
+		angleEnd =  angleStart + (360 * data / analyzed_data.metrics.sum),
+		x1 = cx + r * Math.cos(-angleStart * rad),
+		x2 = cx + r * Math.cos(-angleEnd * rad),
+		y1 = cy + r * Math.sin(-angleStart * rad),
+		y2 = cy + r * Math.sin(-angleEnd * rad);
+
+	shape.angleStart = angleStart;
+	shape.angleEnd = angleEnd;
+	shape.d = ['M' + cx, cy + 'L' + x1, y1 + 'A' + r, r, 0, +(angleEnd - angleStart > 180), 0, x2, y2 + 'z'].join(',');
+	shape.from.d = shape.from.d.split(',');
+	shape.from.d[5] = +(angleEnd - angleStart > 180);
+	shape.from.d = shape.from.d.join(',');
+
+	if (shape.other.rainbow) {
+		shape.fill = loupe_random_color();
+	}
+
+	return shape;
+}
+
+function loupe_hover_bounce (shape) {
+
+	shape.other.events = shape.other.events || {};
+	shape.other.events.mouseover = function(e, shape) {
+		//shape._el.originalTransform = loupe_attr(shape._el, 'transform');
+		var hoverBounce = (shape.other.hoverBounce.offset || shape.other.hoverBounce) / 10,
+			newCX = (shape.cx * -1) / 10 * hoverBounce,
+			newCY = (shape.cy * -1) / 10 * hoverBounce;
+
+		shape._currentAnimation = loupe_animate(shape._el, {
+			prop: 'transform',
+			start: shape._el.originalTransform || 'matrix(1, 0, 0, 1, 0, 0)',
+			stop: 'matrix(1.' + hoverBounce + ', 0, 0, 1.' + hoverBounce + ', ' + newCX + ',' + newCY + ')',
+			duration: shape.other.hoverBounce.duration || 200
+		});
+	}
+	shape.other.events.mouseout = function(e, shape) {
+		if (shape._currentAnimation) {
+			loupe_stop_task(shape._currentAnimation);
+		}
+
+		shape._currentAnimation = loupe_animate(shape._el, {
+			prop: 'transform',
+			start: loupe_attr(shape._el, 'transform'),
+			stop: 'matrix(1, 0, 0, 1, 0, 0)',
+			duration: shape.other.hoverBounce.duration || 200
+		});
+
+		// if (shape._el.originalTransform) {
+		// 	loupe_attr(shape._el, 'transform', shape._el.originalTransform);
+		// }
+		// else {
+		// 	loupe_remove_attr(shape._el, 'transform');
+		// }
+	}
+}
+
+loupe_cls(loupe, {
+
+	pie: function(props) {
+
+		var self = this,
+			config = {
+				tag: 'path',
+				_tag: 'pie',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_pie_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = loupe_extend({}, props[prop]);
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}	
+
+		if (!config.d) {
+			config.d = 'M0,0L0,0A0,0,0,0,0,0,0z';
+		}
+
+		if (config.other.hoverBounce) {
+			loupe_hover_bounce(config);
+		}
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
+		return self;
+	}
+})
 // Source: src/engines/svg/svg.js
 function loupe_get_map (type) {
 	switch(type) {
@@ -689,9 +1001,6 @@ loupe_cls(loupe, {
 		var self = this;
 
 		loupe_each(self.queue, function (shape_queue, key, index) {
-			var anim_queue = [],
-				anim_element = null;
-
 			loupe_each(shape_queue, function (shapes) {
 				loupe_each(shapes, function(shape) {
 
@@ -707,60 +1016,39 @@ loupe_cls(loupe, {
 					}
 
 					if (self.animate_on || shape.other.animate) {
-						var type = loupe_createEl(loupe_svg_ns, shape.original);
-						svg.appendChild(type);
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape.from);
+						svg.appendChild(shapeEl);
 
-						// if (!anim_element) {
-						// 	anim_element = type;
-						// }
+						shape._el = shapeEl;
 
-						// if (self.animate_synchronous || shape.animate_synchronous) {
-						// 	loupe_each(shape, function(val, prop) {
-						// 		if (prop in {cx: null, cy: null, r: null}) {
-						// 			anim_queue.push({
-						// 				prop: prop,
-						// 				start: shape.original[prop],
-						// 				stop: shape[prop],
-						// 				duration: self.animate_duration || shape.animate_duration
-						// 			});
-
-						// 			var last = null;
-						// 			loupe_each(anim_queue, function(anim) {
-						// 				if (last != null) {
-						// 					last.callback = function(t, l) {
-						// 						loupe_animate(t, l);
-						// 					};
-						// 					last.callback_args = [type, last];										
-						// 				}
-						// 				last = anim;
-						// 			});
-						// 		}
-						// 	});
-						// }
-						// else {
-							loupe_each(shape, function(val, prop) {
-								if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
-									loupe_animate(type, {
-										prop: prop,
-										start: shape.original[prop],
-										stop: shape[prop],
-										duration: self.animate_duration || shape.other.animate_duration || 200,
-										animate_method: shape.other.animate_method
-									});
-								}
-							});
-						//}
+						loupe_each(shape.other.events, function(handler, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						});
+						
+						loupe_each(shape, function(val, prop) {
+							if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
+								loupe_animate(shapeEl, {
+									prop: prop,
+									start: shape.from[prop] || shape[prop] || 0,
+									stop: shape[prop],
+									duration: self.animate_duration || shape.other.animate_duration || 200,
+									animate_method: shape.other.animate_method
+								});
+							}
+						});					
 					}
 					else {
-						var type = loupe_createEl(loupe_svg_ns, shape);
-						svg.appendChild(type);
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape);
+						svg.appendChild(shapeEl);
+
+						shape._el = shapeEl;
+
+						loupe_each(shape.other.events, function(handler, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						});
 					}
 				});
 			});
-
-			// if (self.animate_on && self.animate_synchronous && anim_queue.length > 0) {
-			// 	loupe_animate(anim_element, anim_queue[0]);
-			// }
 		});
 
 		return self;

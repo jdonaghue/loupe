@@ -28,6 +28,8 @@ function loupe_animate (el, opts) {
 			[el, opts.prop, opts.stop],
 			null,
 			10);
+
+	return id;
 }
 
 loupe_cls(loupe, {

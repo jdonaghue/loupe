@@ -7,6 +7,9 @@ function loupe_get_add (type) {
 		case 'fill': {
 			return loupe_color_add;	
 		} 
+		case 'transform': {
+			return loupe_transform_add
+		}	
 		default: {
 			return loupe_numeric_add;
 		}
@@ -22,6 +25,9 @@ function loupe_get_sub (type) {
 		case 'fill': {
 			return loupe_color_sub;	
 		}
+		case 'transform': {
+			return loupe_transform_sub;
+		}	
 		default: {
 			return loupe_numeric_sub;
 		}
@@ -37,6 +43,9 @@ function loupe_get_mult (type) {
 		case 'fill': {
 			return loupe_color_mult;	
 		}
+		case 'transform': {
+			return loupe_transform_mult;
+		}	
 		default: {
 			return loupe_numeric_mult;
 		}
@@ -52,6 +61,9 @@ function loupe_get_divide (type) {
 		case 'fill': {
 			return loupe_color_divide;	
 		}
+		case 'transform': {
+			return loupe_transform_divide;
+		}	
 		default: {
 			return loupe_numeric_divide;
 		}

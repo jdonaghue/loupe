@@ -5,15 +5,15 @@
 		<script src="../loupe.js"></script>
 		<script>
 			window.onload = function() {
-				for (var i=0; i < 25; i++) {
+				for (var i=0; i < 1; i++) {
 					var el = document.createElement('div');
-					el.setAttribute('style','display: inline-block; width: 200px; height: 200px;');
+					el.setAttribute('style','display: inline-block; width: 1000px; height: 1000px;');
 					peppy.query('body')[0].appendChild(el);
 				}
 
 				loupe('div')
 					.circle({
-						centerX: 150,
+						centerX: 175,
 						centerY: 100,
 						radius: 100,
 						color: 'red',
@@ -26,7 +26,7 @@
 						centerX: 10,
 						centerY: 10,
 						radius: 50,
-						color: 'green',
+						color: 'blue',
 						strokeColor: 'black',
 						stroke: '2',
 						animate: true,
@@ -49,6 +49,50 @@
 						animate_duration: 2000
 					})
 					.data([.5, .2, .8, .4])
+					.transform('linear', { 
+						radius: null, 
+						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 
+						centerY: null, 
+						d: null,
+						color: null
+					})
+					//.animate({ duration: 300, synchronous: false})
+					.draw();
+
+				loupe('div')
+					.pie({
+						from: {
+							strokeColor: 'yellow',
+							'stroke-width':0,
+							d: 'M100,100L100,100A0,0,0,0,0,10,10z'
+						},
+						centerX: 350,
+						centerY: 300,
+						radius: 200,
+						color: 'red',
+						strokeColor: 'yellow',
+						stroke:'3',
+						rainbow: true,
+						animate: true,
+						animate_duration: 5000,
+						hoverBounce: { 
+							offset: 10,
+							duration: 300
+						},
+						events: {
+							click: function(e, shape) {
+								alert(shape.tag);
+							},
+							mouseover: function(e, shape) {
+								console.log('in');
+							},
+							mouseout: function(e, shape) {
+								console.log('out');
+							}
+						}
+					})
+					.data([10,2,3,4, 7,100])
+					//.data([.5, .2, .8, .4])
 					.transform('linear', { 
 						radius: null, 
 						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 

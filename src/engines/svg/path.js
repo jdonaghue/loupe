@@ -1,4 +1,7 @@
 var loupe_path_svg_map = loupe_extend({
+	centerX: 'cx',
+	centerY: 'cy',
+	radius: 'r',
 	d: 'd'
 }, loupe_shape);
 
@@ -16,6 +19,9 @@ loupe_cls(loupe, {
 			var mapped_prop = loupe_path_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = props[prop];
 			}
 			else {
 				config.other[prop] = props[prop];

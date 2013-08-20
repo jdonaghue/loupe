@@ -1,11 +1,3 @@
-var loupe_color_to_hex_map = {
-	white: '#FFFFFF',
-	red: '#FF0000',
-	black: '#000000',
-	green: '#008000',
-	yellow: '#ffff00'
-}
-
 function loupe_color_add (d, dx) {
 
 	return loupe_color_math(d, dx, 'add');	

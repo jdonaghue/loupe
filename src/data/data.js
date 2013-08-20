@@ -4,14 +4,15 @@ loupe_cls(loupe, {
 		
 		var self = this;
 
-		if (opts && opts.replace) {
+		opts = opts || {};
+		if (opts.replace) {
 			self.data_points = datapoints;	
 		}
 		else {
 			self.data_points = self.data_points.concat(datapoints);
 		}
 
-		self.analyzed_data = loupe_analyze_data(self.data_points);
+		self.analyzed_data = loupe_analyze_data(self.data_points, opts.reader);
 
 		return self;
 	}

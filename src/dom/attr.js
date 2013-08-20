@@ -1,8 +1,27 @@
 function loupe_attr (el, key, val, ns) {
-	if (ns) {
-		el.setAttributeNS(ns, key, val + '');
+	if (val) {
+		if (ns) {
+			el.setAttributeNS(ns, key, val + '');
+		}
+		else {
+			el.setAttribute(key, val + '');
+		}
 	}
 	else {
-		el.setAttribute(key, val + '');
+		if (ns) {
+			return el.getAttributeNS(ns, key);
+		}
+		else {
+			return el.getAttribute(key);
+		}	
+	}
+}
+
+function loupe_remove_attr (el, key, ns) {
+	if (ns) {
+		el.removeAttributeNS(ns, key);
+	}
+	else {
+		el.removeAttribute(key);
 	}
 }

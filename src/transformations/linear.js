@@ -1,4 +1,4 @@
-function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, index) {
+function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, engine, index) {
 
 	var map;
 

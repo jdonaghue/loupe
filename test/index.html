@@ -56,7 +56,7 @@
 						d: null,
 						color: null
 					})
-					//.animate({ duration: 300, synchronous: false})
+				// 	//.animate({ duration: 300, synchronous: false})
 					.draw();
 
 				loupe('div')
@@ -64,12 +64,13 @@
 						from: {
 							strokeColor: 'yellow',
 							'stroke-width':0,
-							d: 'M100,100L100,100A0,0,0,0,0,10,10z'
+							d: 'M100,100L100,100A0,0,0,0,0,10,10z',
+							fill: ['white', 'white', 'white', 'white']
 						},
 						centerX: 350,
 						centerY: 300,
 						radius: 200,
-						color: 'red',
+						color: ['red', 'yellow', 'blue', 'green'],
 						strokeColor: 'yellow',
 						stroke:'3',
 						rainbow: true,

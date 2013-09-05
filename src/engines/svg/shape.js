@@ -3,3 +3,7 @@ var loupe_shape = {
 	strokeColor: 'stroke',
 	color: 'fill'
 }	
+
+var loupe_property_default = {
+	fill: '#FFF'
+}

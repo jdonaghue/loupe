@@ -13,7 +13,14 @@ loupe_cls(loupe, {
 
 					switch (mode) {
 						case 'linear': {
-							loupe_linear_transform(shape, prevShape[shape._tag || shape.tag], self.analyzed_data[index], self.analyzed_data, opts, index);
+							loupe_linear_transform(
+								shape, 
+								prevShape[shape._tag || shape.tag], 
+								self.analyzed_data[index], 
+								self.analyzed_data, 
+								opts, 
+								self.engine,
+								index);
 							break;
 						}
 					}

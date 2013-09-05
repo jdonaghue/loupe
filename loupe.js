@@ -45,6 +45,10 @@ function loupe_each(list, fn) {
 function loupe_is_function (fn) {
 	return typeof fn == 'function';
 }
+// Source: src/core/isArray.js
+function loupe_is_array (obj) {
+	return obj instanceof Array; 
+}
 // Source: src/core/fn.js
 function loupe_fn() {
 	
@@ -115,7 +119,7 @@ var loupe_color_to_hex_map = {
 	white: '#FFFFFF',
 	red: '#FF0000',
 	black: '#000000',
-	green: '#008000',
+	green: '#00FF00',
 	yellow: '#ffff00',
 	blue: '#0000ff'
 }
@@ -607,11 +611,11 @@ function loupe_analyze_data (data, reader) {
 	data.metrics = {};
 	data.metrics.sum = 0;
 
-	reader = typeof reader == 'function' ? reader : function(a) { return a };
+	reader = typeof reader == 'function' ? reader : function(a) { return { value: a }; };
 
 	loupe_each(data, function(val, key) {
 		if (key != 'metrics') {
-			data.metrics.sum += reader(val);
+			data.metrics.sum += reader(val).value;
 		}
 	});
 
@@ -650,16 +654,18 @@ function loupe_sync_data(self) {
 			loupe_each(self.shapes, function(shape) {
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
-					if (dKey != 'metrics' && dKey != 'length') {
+					if (dKey != 'metrics') {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
 							if (typeof val == 'object') {
-								clone[key] = loupe_extend({}, val);
+								clone[key] = loupe_extend(loupe_is_array(val) ? [] : {}, val);
 							}
 							else {
 								clone[key] = val;
 							}
 						});
+						clone.data = d;
+						clone.dataIndex = dKey;
 						shape_queue.push(clone);
 					}
 				});
@@ -676,7 +682,7 @@ function loupe_sync_data(self) {
 				var clone = {};
 				loupe_each(shape, function(val, key) {
 					if (typeof val == 'object') {
-						clone[key] = loupe_extend({}, val);
+						clone[key] = loupe_extend(loupe_is_array(val) ? [] : {}, val);
 					}
 					else {
 						clone[key] = val;
@@ -692,7 +698,7 @@ function loupe_sync_data(self) {
 	self.queue = dom_queue;
 }
 // Source: src/transformations/linear.js
-function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, index) {
+function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, engine, index) {
 
 	var map;
 
@@ -735,7 +741,14 @@ loupe_cls(loupe, {
 
 					switch (mode) {
 						case 'linear': {
-							loupe_linear_transform(shape, prevShape[shape._tag || shape.tag], self.analyzed_data[index], self.analyzed_data, opts, index);
+							loupe_linear_transform(
+								shape, 
+								prevShape[shape._tag || shape.tag], 
+								self.analyzed_data[index], 
+								self.analyzed_data, 
+								opts, 
+								self.engine,
+								index);
 							break;
 						}
 					}
@@ -749,12 +762,32 @@ loupe_cls(loupe, {
 		return self;
 	}
 });
+// Source: src/engines/engines.js
+loupe_cls(loupe, {
+
+	draw: function () {
+
+		var self = this;
+
+		self.engine = self.engine || 'svg';
+
+		if (self.engine == 'svg') {
+			return self.draw_svg();
+		}
+
+		return self;
+	}
+});
 // Source: src/engines/svg/shape.js
 var loupe_shape = {
 	stroke: 'stroke-width',
 	strokeColor: 'stroke',
 	color: 'fill'
 }	
+
+var loupe_property_default = {
+	fill: '#FFF'
+}
 // Source: src/engines/svg/circle.js
 var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
@@ -834,7 +867,11 @@ var loupe_path_svg_map = loupe_extend({
 	centerX: 'cx',
 	centerY: 'cy',
 	radius: 'r',
-	d: 'd'
+	d: 'd',
+	moveTo: 'M',
+	arcTo: 'A',
+	lineTo: 'L',
+	curveTo: 'C'
 }, loupe_shape);
 
 loupe_cls(loupe, {
@@ -858,7 +895,24 @@ loupe_cls(loupe, {
 			else {
 				config.other[prop] = props[prop];
 			}
-		}		
+		}	
+
+		if (!config.d) {
+			config.d = '';
+			if (config.M) {
+				config.d = 'M' + config.M;
+			}
+			if (config.A) {
+				config.d += 'A' + config.A;
+			}
+			if (config.L) {
+				config.d += 'L' + config.L;
+			}
+			if (config.C) {
+				config.d += 'C' + config.C;
+			}
+			config.d += 'Z';
+		}	
 
 		self.shapes.push(config);
 
@@ -869,11 +923,8 @@ loupe_cls(loupe, {
 });
 // Source: src/engines/svg/pie.js
 var loupe_pie_svg_map = loupe_extend({
-	centerX: 'cx',
-	centerY: 'cy',
-	radius: 'r',
-	d: 'd'
-}, loupe_shape);
+	
+}, loupe_path_svg_map);
 
 function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
 
@@ -896,18 +947,16 @@ function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
 	shape.from.d[5] = +(angleEnd - angleStart > 180);
 	shape.from.d = shape.from.d.join(',');
 
-	if (shape.other.rainbow) {
-		shape.fill = loupe_random_color();
-	}
+	shape.fill = (loupe_is_array(shape.fill) ? shape.fill[index] : loupe_random_color())
+		 || (shape.other.rainbow ? loupe_random_color() : loupe_property_default.fill);
 
 	return shape;
 }
 
-function loupe_hover_bounce (shape) {
+function loupe_pie_hover_bounce (shape) {
 
 	shape.other.events = shape.other.events || {};
 	shape.other.events.mouseover = function(e, shape) {
-		//shape._el.originalTransform = loupe_attr(shape._el, 'transform');
 		var hoverBounce = (shape.other.hoverBounce.offset || shape.other.hoverBounce) / 10,
 			newCX = (shape.cx * -1) / 10 * hoverBounce,
 			newCY = (shape.cy * -1) / 10 * hoverBounce;
@@ -930,13 +979,6 @@ function loupe_hover_bounce (shape) {
 			stop: 'matrix(1, 0, 0, 1, 0, 0)',
 			duration: shape.other.hoverBounce.duration || 200
 		});
-
-		// if (shape._el.originalTransform) {
-		// 	loupe_attr(shape._el, 'transform', shape._el.originalTransform);
-		// }
-		// else {
-		// 	loupe_remove_attr(shape._el, 'transform');
-		// }
 	}
 }
 
@@ -969,7 +1011,7 @@ loupe_cls(loupe, {
 		}
 
 		if (config.other.hoverBounce) {
-			loupe_hover_bounce(config);
+			loupe_pie_hover_bounce(config);
 		}
 
 		self.shapes.push(config);
@@ -996,7 +1038,7 @@ function loupe_get_map (type) {
 
 loupe_cls(loupe, {
 
-	draw: function () {
+	draw_svg: function () {
 
 		var self = this;
 
@@ -1027,17 +1069,34 @@ loupe_cls(loupe, {
 						
 						loupe_each(shape, function(val, prop) {
 							if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
+								var start, stop;
+
+								if (shape.from[prop]) {
+									start = loupe_is_array(shape.from[prop]) ? shape.from[prop][shape.dataIndex] || shape[prop] : shape.from[prop];
+								}
+								else {
+									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+								}
+							
+								stop = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+
 								loupe_animate(shapeEl, {
 									prop: prop,
-									start: shape.from[prop] || shape[prop] || 0,
-									stop: shape[prop],
+									start: start || loupe_property_default[prop] || 0,
+									stop: stop || loupe_property_default[prop] || 0,
 									duration: self.animate_duration || shape.other.animate_duration || 200,
 									animate_method: shape.other.animate_method
 								});
 							}
-						});					
+						});
 					}
 					else {
+						loupe_each(shape, function(val, prop) {
+							if (loupe_is_array(val)){
+								shape[prop] = val[shape.dataIndex] || loupe_property_default[prop] || 0;
+ 							}
+						});
+
 						var shapeEl = loupe_createEl(loupe_svg_ns, shape);
 						svg.appendChild(shapeEl);
 
@@ -1050,6 +1109,8 @@ loupe_cls(loupe, {
 				});
 			});
 		});
+
+		self.queue = [];
 
 		return self;
 	}

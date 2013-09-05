@@ -8,16 +8,18 @@ function loupe_sync_data(self) {
 			loupe_each(self.shapes, function(shape) {
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
-					if (dKey != 'metrics' && dKey != 'length') {
+					if (dKey != 'metrics') {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
 							if (typeof val == 'object') {
-								clone[key] = loupe_extend({}, val);
+								clone[key] = loupe_extend(loupe_is_array(val) ? [] : {}, val);
 							}
 							else {
 								clone[key] = val;
 							}
 						});
+						clone.data = d;
+						clone.dataIndex = dKey;
 						shape_queue.push(clone);
 					}
 				});
@@ -34,7 +36,7 @@ function loupe_sync_data(self) {
 				var clone = {};
 				loupe_each(shape, function(val, key) {
 					if (typeof val == 'object') {
-						clone[key] = loupe_extend({}, val);
+						clone[key] = loupe_extend(loupe_is_array(val) ? [] : {}, val);
 					}
 					else {
 						clone[key] = val;

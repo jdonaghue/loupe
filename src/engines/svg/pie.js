@@ -1,9 +1,5 @@
 var loupe_pie_svg_map = loupe_extend({
-	centerX: 'cx',
-	centerY: 'cy',
-	radius: 'r',
-	d: 'd'
-}, loupe_shape);
+}, loupe_path_svg_map);
 
 function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
 
@@ -26,14 +22,13 @@ function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
 	shape.from.d[5] = +(angleEnd - angleStart > 180);
 	shape.from.d = shape.from.d.join(',');
 
-	if (shape.other.rainbow) {
-		shape.fill = loupe_random_color();
-	}
+	shape.fill = (loupe_is_array(shape.fill) ? shape.fill[index] : loupe_random_color())
+		 || (shape.other.rainbow ? loupe_random_color() : loupe_property_default.fill);
 
 	return shape;
 }
 
-function loupe_hover_bounce (shape) {
+function loupe_pie_hover_bounce (shape) {
 
 	shape.other.events = shape.other.events || {};
 	shape.other.events.mouseover = function(e, shape) {
@@ -91,7 +86,7 @@ loupe_cls(loupe, {
 		}
 
 		if (config.other.hoverBounce) {
-			loupe_hover_bounce(config);
+			loupe_pie_hover_bounce(config);
 		}
 
 		self.shapes.push(config);

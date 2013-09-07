@@ -4,13 +4,6 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		// qunit: {
-		// 	files: [ 
-		// 		"test/css3-compat/css3-compat.html?engine=peppy#target", 
-		// 		"test/jquery/jquery1.html", 
-		// 		"test/jquery/jquery2.html" 
-		// 	]
-		// },
 		concat: {
 			dist: {
 				options: {

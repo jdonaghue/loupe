@@ -1,6 +1,6 @@
 loupe_cls(loupe, {
 
-	sEngine: peppy ? peppy.query : loupe_noop,
+	sEngine: window.peppy ? peppy.query : loupe_noop,
 
 	query: function (selector, context) {
 

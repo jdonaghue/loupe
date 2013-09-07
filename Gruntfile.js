@@ -4,7 +4,7 @@ module.exports = function(grunt) {
 
 	grunt.initConfig({
 		pkg: grunt.file.readJSON('package.json'),
-		concat: { 
+		concat: {  
 			dist: {
 				options: {
 					process: function(src, filepath) {

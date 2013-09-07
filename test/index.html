@@ -5,11 +5,6 @@
 		<script src="../loupe.js"></script>
 		<script>
 			window.onload = function() {
-				for (var i=0; i < 1; i++) {
-					var el = document.createElement('div');
-					el.setAttribute('style','display: inline-block; width: 1000px; height: 1000px;');
-					peppy.query('body')[0].appendChild(el);
-				}
 
 				loupe('div', { width: '1000px', height: '1000px'})
 					.circle({
@@ -105,7 +100,20 @@
 					.draw();
 			}
 		</script>
+
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, sans-serif;
+			}
+
+			.container {
+				width: 1000px;
+				height: 1000px;
+			}
+		</style>
 	</head>
 	<body>	
+		<h1>Pie Chart</h1>
+		<div class="container"></div>
 	</body>
 </html>

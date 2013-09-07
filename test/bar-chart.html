@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../../Peppy/peppy.js"></script>
+		<script src="../loupe.js"></script>
+		<script>
+			window.onload = function() {
+				var data = [1, 2, 3, 4, .7];
+
+				// draw the axes
+				loupe('div')
+					.line({
+						x1: 78,
+						y1: 0,
+						x2: 78,
+						y2: 200,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.line({
+						x1: 78,
+						y1: 200,
+						x2: 700,
+						y2: 200,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.draw();
+
+				// draw x ticks
+				loupe('div')
+					.line({
+						x1: 148,
+						y1: 200,
+						x2: 148,
+						y2: 205,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.data(data)
+					.transform('linear', {
+						x1: null,
+						x2: null
+					})
+					.draw();
+
+				// draw y ticks
+				loupe('div')
+					.line({
+						x1: 73,
+						y1: 40,
+						x2: 78,
+						y2: 40,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.data(data)
+					.transform('linear', {
+						y1: null,
+						y2: null
+					})
+					.draw();
+
+				
+			}
+		</script>
+	</head>
+	<body>
+		<div style="width: 1000px; height: 1000px;"></div>
+	</body>
+</html>

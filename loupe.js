@@ -60,7 +60,7 @@ function loupe_noop() {}
 var loupe_svg_ns = 'http://www.w3.org/2000/svg',
 	loupe_svg_version = '1.1'
 
-_win.loupe = function (selector) {
+_win.loupe = function (selector, props) {
 	if (this instanceof loupe){
 		return;
 	}
@@ -70,12 +70,18 @@ _win.loupe = function (selector) {
 	L.queue = [];
 	L.data_points = [];
 	L.analyzed_data = [];
+
+	if (props) {
+		L.width = props.width;
+		L.height = props.height;
+	}
+	
 	return L;	
 }
 // Source: src/core/selector.js
 loupe_cls(loupe, {
 
-	sEngine: peppy ? peppy.query : loupe_noop,
+	sEngine: window.peppy ? peppy.query : loupe_noop,
 
 	query: function (selector, context) {
 
@@ -605,6 +611,17 @@ function loupe_createEl(ns, props) {
 	}
 	return el;
 }
+// Source: src/dom/style.js
+function loupe_style (el, prop, val) {
+	if (typeof prop == 'object') {
+		loupe_each(prop, function(v, k) {
+			el.style[k] = v;
+		});
+	}
+	else {
+		el.style[prop] = val;
+	}
+}
 // Source: src/data/analyze.js
 function loupe_analyze_data (data, reader) {
 
@@ -788,6 +805,78 @@ var loupe_shape = {
 var loupe_property_default = {
 	fill: '#FFF'
 }
+// Source: src/engines/svg/text.js
+var loupe_text_svg_map = loupe_extend({
+}, loupe_shape);
+
+loupe_cls(loupe, {
+
+	text: function (props) {
+
+		var self = this,
+			config = {
+				tag: 'text',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_polyline_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}		
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
+		return self;
+	}
+});
+// Source: src/engines/svg/line.js
+var loupe_line_svg_map = loupe_extend({
+	x1: 'x1',
+	x2: 'x2',
+	y1: 'y1',
+	y2: 'y2'
+}, loupe_shape);
+
+loupe_cls(loupe, {
+
+	line: function (props) {
+
+		var self = this,
+			config = {
+				tag: 'line',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_line_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}		
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
+		return self;
+	}
+});
 // Source: src/engines/svg/circle.js
 var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
@@ -825,11 +914,84 @@ loupe_cls(loupe, {
 		return self;
 	}
 });
+// Source: src/engines/svg/polyline.js
+var loupe_polyline_svg_map = loupe_extend({
+	points: 'points'
+}, loupe_shape);
+
+loupe_cls(loupe, {
+
+	polyline: function (props) {
+
+		var self = this,
+			config = {
+				tag: 'polyline',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_polyline_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}		
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
+		return self;
+	}
+});
+// Source: src/engines/svg/polygon.js
+var loupe_polygon_svg_map = loupe_extend({
+	points: 'points'
+}, loupe_shape);
+
+loupe_cls(loupe, {
+
+	polygon: function (props) {
+
+		var self = this,
+			config = {
+				tag: 'polygon',
+				other: {}
+			};
+
+		for (var prop in props) {
+			var mapped_prop = loupe_polygon_svg_map[prop];
+			if (mapped_prop) {
+				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'from') {
+				config.from = props[prop];
+			}
+			else {
+				config.other[prop] = props[prop];
+			}
+		}		
+
+		self.shapes.push(config);
+
+		loupe_sync_data(self);
+		
+		return self;
+	}
+});
 // Source: src/engines/svg/rect.js
 var loupe_rect_svg_map = loupe_extend({
-	xOffset: 'cx',
-	yOffset: 'cy',
-	radius: 'r'
+	x: 'x',
+	y: 'y',
+	rx: 'rx',
+	ry: 'ry',
+	width: 'width',
+	height: 'height'
 }, loupe_shape);
 
 loupe_cls(loupe, {
@@ -923,7 +1085,6 @@ loupe_cls(loupe, {
 });
 // Source: src/engines/svg/pie.js
 var loupe_pie_svg_map = loupe_extend({
-	
 }, loupe_path_svg_map);
 
 function loupe_path_to_pie (shape, prevShape, data, analyzed_data, index) {
@@ -1033,6 +1194,15 @@ function loupe_get_map (type) {
 		case 'path': {
 			return loupe_path_svg_map;
 		}
+		case 'line': {
+			return loupe_line_svg_map;
+		}
+		case 'polygon': {
+			return loupe_polygon_svg_map;
+		}
+		case 'polyline': {
+			return loupe_polyline_svg_map;
+		}
 	}
 }
 
@@ -1049,10 +1219,19 @@ loupe_cls(loupe, {
 					var el = self.dom[index],
 						svg = self.sEngine('svg', el)[0];
 
+					if (self.width || self.height) {
+						loupe_style(el, { 
+							width: self.width,
+							height: self.height
+						});
+					}
+
 					if (!svg) {
 						svg = loupe_createEl(loupe_svg_ns, { 
 							tag: 'svg', 
-							version: loupe_svg_version
+							version: loupe_svg_version,
+							width: self.width || '100%',
+							height: self.height || '100%'
 						});
 						el.appendChild(svg);
 					}
@@ -1068,7 +1247,7 @@ loupe_cls(loupe, {
 						});
 						
 						loupe_each(shape, function(val, prop) {
-							if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
+							if (prop in {cx: null, cy: null, r: null, d: null, fill: null, x:null, y:null, width: null, height: null, x1: null, x2: null, y1: null, y2: null}) {
 								var start, stop;
 
 								if (shape.from[prop]) {

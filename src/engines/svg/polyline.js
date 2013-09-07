@@ -1,24 +1,19 @@
-var loupe_rect_svg_map = loupe_extend({
-	x: 'x',
-	y: 'y',
-	rx: 'rx',
-	ry: 'ry',
-	width: 'width',
-	height: 'height'
+var loupe_polyline_svg_map = loupe_extend({
+	points: 'points'
 }, loupe_shape);
 
 loupe_cls(loupe, {
 
-	rect: function (props) {
+	polyline: function (props) {
 
 		var self = this,
 			config = {
-				tag: 'rect',
+				tag: 'polyline',
 				other: {}
 			};
 
 		for (var prop in props) {
-			var mapped_prop = loupe_rect_svg_map[prop];
+			var mapped_prop = loupe_polyline_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}
@@ -33,7 +28,7 @@ loupe_cls(loupe, {
 		self.shapes.push(config);
 
 		loupe_sync_data(self);
-
+		
 		return self;
 	}
 });

@@ -9,6 +9,15 @@ function loupe_get_map (type) {
 		case 'path': {
 			return loupe_path_svg_map;
 		}
+		case 'line': {
+			return loupe_line_svg_map;
+		}
+		case 'polygon': {
+			return loupe_polygon_svg_map;
+		}
+		case 'polyline': {
+			return loupe_polyline_svg_map;
+		}
 	}
 }
 
@@ -25,10 +34,19 @@ loupe_cls(loupe, {
 					var el = self.dom[index],
 						svg = self.sEngine('svg', el)[0];
 
+					if (self.width || self.height) {
+						loupe_style(el, { 
+							width: self.width,
+							height: self.height
+						});
+					}
+
 					if (!svg) {
 						svg = loupe_createEl(loupe_svg_ns, { 
 							tag: 'svg', 
-							version: loupe_svg_version
+							version: loupe_svg_version,
+							width: self.width || '100%',
+							height: self.height || '100%'
 						});
 						el.appendChild(svg);
 					}
@@ -44,7 +62,7 @@ loupe_cls(loupe, {
 						});
 						
 						loupe_each(shape, function(val, prop) {
-							if (prop in {cx: null, cy: null, r: null, d: null, fill: null}) {
+							if (prop in {cx: null, cy: null, r: null, d: null, fill: null, x:null, y:null, width: null, height: null, x1: null, x2: null, y1: null, y2: null}) {
 								var start, stop;
 
 								if (shape.from[prop]) {

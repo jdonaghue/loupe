@@ -1,24 +1,22 @@
-var loupe_rect_svg_map = loupe_extend({
-	x: 'x',
-	y: 'y',
-	rx: 'rx',
-	ry: 'ry',
-	width: 'width',
-	height: 'height'
+var loupe_line_svg_map = loupe_extend({
+	x1: 'x1',
+	x2: 'x2',
+	y1: 'y1',
+	y2: 'y2'
 }, loupe_shape);
 
 loupe_cls(loupe, {
 
-	rect: function (props) {
+	line: function (props) {
 
 		var self = this,
 			config = {
-				tag: 'rect',
+				tag: 'line',
 				other: {}
 			};
 
 		for (var prop in props) {
-			var mapped_prop = loupe_rect_svg_map[prop];
+			var mapped_prop = loupe_line_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}
@@ -33,7 +31,7 @@ loupe_cls(loupe, {
 		self.shapes.push(config);
 
 		loupe_sync_data(self);
-
+		
 		return self;
 	}
 });

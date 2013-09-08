@@ -6,55 +6,7 @@
 		<script>
 			window.onload = function() {
 
-				loupe('div', { width: '1000px', height: '1000px'})
-					.circle({
-						centerX: 175,
-						centerY: 100,
-						radius: 100,
-						color: 'red',
-						strokeColor: 'black',
-						stroke:'2',
-						animate: true,
-						animate_duration: 300
-					})
-					.circle({
-						centerX: 10,
-						centerY: 10,
-						radius: 50,
-						color: 'blue',
-						strokeColor: 'black',
-						stroke: '2',
-						animate: true,
-						animate_duration: 1000
-					})
-					.path({
-						strokeColor: 'black',
-						stroke: '2',
-						color: 'white',
-						d: 'M75,75L75,75A50,50,0,0,0,10,10Z',
-						animate: true,
-						animate_duration: 1500
-					})
-					.path({
-						strokeColor: 'black',
-						stroke: '2',
-						color: 'yellow',
-						d: 'M150,150L150,150A50,50,0,0,0,80,80Z',
-						animate: true,
-						animate_duration: 2000
-					})
-					.data([.5, .2, .8, .4])
-					.transform('linear', { 
-						radius: null, 
-						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 
-						centerY: null, 
-						d: null,
-						color: null
-					})
-				// 	//.animate({ duration: 300, synchronous: false})
-					.draw();
-
-				loupe('div', { width: '1000px', height: '1000px'})
+				loupe('div')
 					.pie({
 						from: {
 							strokeColor: 'yellow',
@@ -62,8 +14,8 @@
 							d: 'M100,100L100,100A0,0,0,0,0,10,10z',
 							fill: ['white', 'white', 'white', 'white']
 						},
-						centerX: 350,
-						centerY: 300,
+						centerX: 250,
+						centerY: 250,
 						radius: 200,
 						color: ['red', 'yellow', 'blue', 'green'],
 						strokeColor: 'yellow',
@@ -88,7 +40,6 @@
 						}
 					})
 					.data([10,2,3,4, 7,100])
-					//.data([.5, .2, .8, .4])
 					.transform('linear', { 
 						radius: null, 
 						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 
@@ -96,7 +47,6 @@
 						d: null,
 						color: null
 					})
-					//.animate({ duration: 300, synchronous: false})
 					.draw();
 			}
 		</script>
@@ -104,11 +54,17 @@
 		<style type="text/css">
 			body {
 				font-family: "Helvetica Neue", Helvetica, sans-serif;
+				padding-left: 70px;
+			}
+
+			h1 {
+				font-size: 65px;
 			}
 
 			.container {
-				width: 1000px;
-				height: 1000px;
+				width: 500px;
+				height: 500px;
+				border: 1px solid #ccc;
 			}
 		</style>
 	</head>

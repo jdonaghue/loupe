@@ -23,6 +23,9 @@ loupe_cls(loupe, {
 								index);
 							break;
 						}
+						case 'tree': {
+							break;
+						}
 					}
 
 					prevShape[shape._tag || shape.tag] = shape;

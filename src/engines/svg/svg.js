@@ -91,7 +91,7 @@ loupe_cls(loupe, {
  							}
 						});
 
-						var shapeEl = loupe_createEl(loupe_svg_ns, shape);
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.other ? shape.other.content : null);
 						svg.appendChild(shapeEl);
 
 						shape._el = shapeEl;

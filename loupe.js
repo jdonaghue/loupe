@@ -60,12 +60,22 @@ function loupe_noop() {}
 var loupe_svg_ns = 'http://www.w3.org/2000/svg',
 	loupe_svg_version = '1.1'
 
-_win.loupe = function (selector, props) {
+_win.loupe = function (selectorOrDOM, props) {
 	if (this instanceof loupe){
 		return;
 	}
 	var L = new loupe();
-	L.query(selector);
+
+	if (loupe_is_array(selectorOrDOM)) {
+		L.dom = selectorOrDOM;
+	}
+	else if (selectorOrDOM.nodeName) {
+		L.dom = [selectorOrDOM];	
+	}
+	else {
+		L.dom = L.query(selectorOrDOM);	
+	}
+	
 	L.shapes = [];
 	L.queue = [];
 	L.data_points = [];
@@ -85,8 +95,7 @@ loupe_cls(loupe, {
 
 	query: function (selector, context) {
 
-		this.dom = this.sEngine(selector, context);
-		return this;
+		return this.sEngine(selector, context);
 	}
 });
 // Source: src/event/event.js
@@ -600,9 +609,15 @@ function loupe_remove_attr (el, key, ns) {
 	}
 }
 // Source: src/dom/create.js
-function loupe_createEl(ns, props) {
+function loupe_createEl(ns, props, content) {
 
 	var el = _doc.createElementNS(ns, props.tag);
+
+	if (content) {
+		if (typeof content == 'string') {
+			el.textContent = content;
+		}
+	}
 
 	for (var prop in props) {
 		if (prop != 'tag' && prop != 'other' && prop != 'original') {
@@ -622,21 +637,22 @@ function loupe_style (el, prop, val) {
 		el.style[prop] = val;
 	}
 }
-// Source: src/data/analyze.js
-function loupe_analyze_data (data, reader) {
+// Source: src/data/analyze_linear.js
+function loupe_analyze_linear_data (data) {
 
 	data.metrics = {};
 	data.metrics.sum = 0;
 
-	reader = typeof reader == 'function' ? reader : function(a) { return { value: a }; };
-
 	loupe_each(data, function(val, key) {
 		if (key != 'metrics') {
-			data.metrics.sum += reader(val).value;
+			var readVal = val;
+			data.metrics.sum += readVal;
+			data.metrics.max = data.metrics.max > readVal ? data.metrics.max : readVal;
+			data.metrics.min = data.metrics.min < readVal ? data.metrics.min : readVal;
 		}
 	});
 
-	data.metrics.avg = data.metrics.total / data.length;
+	data.metrics.avg = data.metrics.sum / data.length;
 
 	return data;
 }
@@ -644,25 +660,35 @@ function loupe_analyze_data (data, reader) {
 loupe_cls(loupe, {
 
 	data: function (datapoints, opts) {
-		
-		var self = this;
 
 		opts = opts || {};
-		if (opts.replace) {
-			self.data_points = datapoints;	
-		}
-		else {
-			self.data_points = self.data_points.concat(datapoints);
-		}
 
-		self.analyzed_data = loupe_analyze_data(self.data_points, opts.reader);
+		var self = this,
+			datacopy = [],
+			reader = typeof opts.reader == 'function' ? opts.reader : function(a) { return { value: a }; };
+
+		if (!opts || !opts.type || opts.type == 'linear') {
+			loupe_each(datapoints, function(data) {
+				datacopy.push(reader(data).value);
+			});
+			
+			if (opts.replace) {
+				self.data_points = datacopy;	
+			}
+			else {
+				self.data_points = self.data_points.concat(datacopy);
+			}
+
+			self.analyzed_data = loupe_analyze_linear_data(self.data_points);
+			self.analyzed_data.type = opts.type || 'linear';
+		}
 
 		return self;
 	}
 });
-// Source: src/data/sync.js
-function loupe_sync_data(self) {
-	
+// Source: src/data/linear_sync.js
+function loupe_linear_sync (self) {
+
 	var dom_queue = [];
 
 	if (self.analyzed_data.length > 0) {
@@ -671,7 +697,7 @@ function loupe_sync_data(self) {
 			loupe_each(self.shapes, function(shape) {
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
-					if (dKey != 'metrics') {
+					if (dKey != 'metrics' && dKey != 'type') {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
 							if (typeof val == 'object') {
@@ -712,7 +738,16 @@ function loupe_sync_data(self) {
 		});
 	}
 
-	self.queue = dom_queue;
+	return dom_queue;
+}
+// Source: src/data/sync.js
+function loupe_sync_data(self) {
+	
+	var dom_queue = [];
+
+	if (!self.analyzed_data.type || self.analyzed_data.type == 'linear') {
+		self.queue = loupe_linear_sync(self);
+	}
 }
 // Source: src/transformations/linear.js
 function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, engine, index) {
@@ -768,6 +803,9 @@ loupe_cls(loupe, {
 								index);
 							break;
 						}
+						case 'tree': {
+							break;
+						}
 					}
 
 					prevShape[shape._tag || shape.tag] = shape;
@@ -799,7 +837,10 @@ loupe_cls(loupe, {
 var loupe_shape = {
 	stroke: 'stroke-width',
 	strokeColor: 'stroke',
-	color: 'fill'
+	color: 'fill',
+	transform: 'transform',
+	class: 'class',
+	style: 'style'
 }	
 
 var loupe_property_default = {
@@ -807,6 +848,13 @@ var loupe_property_default = {
 }
 // Source: src/engines/svg/text.js
 var loupe_text_svg_map = loupe_extend({
+	x: 'x',
+	y: 'y',
+	dx: 'dx',
+	dy: 'dy',
+	rotate: 'rotate',
+	textLength: 'textLength',
+	lengthAdjust: 'lengthAdjust'
 }, loupe_shape);
 
 loupe_cls(loupe, {
@@ -823,6 +871,9 @@ loupe_cls(loupe, {
 			var mapped_prop = loupe_polyline_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'position') {
+				config.transform = 'translate(' + props[prop] + ')';
 			}
 			else if (prop == 'from') {
 				config.from = props[prop];
@@ -1276,7 +1327,7 @@ loupe_cls(loupe, {
  							}
 						});
 
-						var shapeEl = loupe_createEl(loupe_svg_ns, shape);
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.other ? shape.other.content : null);
 						svg.appendChild(shapeEl);
 
 						shape._el = shapeEl;

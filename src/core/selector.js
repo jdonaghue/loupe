@@ -4,7 +4,6 @@ loupe_cls(loupe, {
 
 	query: function (selector, context) {
 
-		this.dom = this.sEngine(selector, context);
-		return this;
+		return this.sEngine(selector, context);
 	}
 });

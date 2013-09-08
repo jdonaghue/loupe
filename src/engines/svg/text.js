@@ -1,4 +1,11 @@
 var loupe_text_svg_map = loupe_extend({
+	x: 'x',
+	y: 'y',
+	dx: 'dx',
+	dy: 'dy',
+	rotate: 'rotate',
+	textLength: 'textLength',
+	lengthAdjust: 'lengthAdjust'
 }, loupe_shape);
 
 loupe_cls(loupe, {
@@ -15,6 +22,9 @@ loupe_cls(loupe, {
 			var mapped_prop = loupe_polyline_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
+			}
+			else if (prop == 'position') {
+				config.transform = 'translate(' + props[prop] + ')';
 			}
 			else if (prop == 'from') {
 				config.from = props[prop];

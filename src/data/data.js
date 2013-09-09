@@ -8,6 +8,8 @@ loupe_cls(loupe, {
 			datacopy = [],
 			reader = typeof opts.reader == 'function' ? opts.reader : function(a) { return { value: a }; };
 
+		self.original_data = datapoints;
+
 		if (!opts.type || opts.type == 'linear') {
 			loupe_each(datapoints, function(data) {
 				datacopy.push(reader(data).value);

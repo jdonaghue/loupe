@@ -7,25 +7,37 @@
 		<script>
 			window.onload = function() {
 
-				function drawBulletChart() {
+				var greybars,
+					middlegrey,
+					darkgrey,
+					lightbluebars,
+					bluebars;
 
-					var data = [{ title: 'Jobs Rate', subtitle: 'USD millions', value: 1.75 }, 
-								{ title: 'Economy', subtitle: 'USD Trillions', value: 2.33 }, 
-								{ title: 'Basketball', subtitle: 'Points', value: 3.48 }, 
-								{ title: 'Shoes', subtitle: 'Size', value: 4 }, 
-								{ title: 'Flights', subtitle: 'Landings', value: .7 }],
-						opts = { reader: function(a) { return a } },
+				function rand(min, max) {
+					return Math.round(min + Math.floor(Math.random() * (max - min)));
+				}
+
+				function drawBulletChart(first) {
+
+					var data = [{ title: 'Jobs Rate', subtitle: 'USD millions', value: rand(10, 400) / 100 }, 
+								{ title: 'Economy', subtitle: 'USD Trillions', value: rand(10, 400) / 100 }, 
+								{ title: 'Basketball', subtitle: 'Points', value: rand(10, 400) / 100 }, 
+								{ title: 'Shoes', subtitle: 'Size', value: rand(100, 400) / 100 }, 
+								{ title: 'Flights', subtitle: 'Landings', value: rand(10, 400) / 100 }],
+						opts = { reader: function(a) { return a }, replace: true },
 						div = peppy.query('div');
 
 					// draw grey bars
-					var greybars = loupe(div)
+					greybars = greybars || loupe(div)
 						.rect({
 							x: 100,
 							y: 30,
 							width: 440,
 							height: 24,
 							color: '#eee'
-						})
+						});
+
+					greybars
 						.data(data, opts)
 						.transform('linear', {
 							y: function(val, data, index) { return 20 + (index * 40); }
@@ -33,14 +45,16 @@
 						.draw();
 
 					// draw middle grey 
-					var middlegrey = loupe(div)
+					middlegrey = middlegrey || loupe(div)
 						.rect({
 							x: 100, 
 							y: 30,
 							width: 110,
 							height: 24,
 							color: '#ddd'
-						})
+						});
+
+					middlegrey
 						.data(data, opts)
 						.transform('linear', {
 							y: function(val, data, index) { return 20 + (index * 40); },
@@ -49,14 +63,16 @@
 						.draw();
 
 					// draw dark grey 
-					var darkgrey = loupe(div)
+					darkgrey = darkgrey || loupe(div)
 						.rect({
 							x: 100, 
 							y: 30,
 							width: 50,
 							height: 24,
 							color: '#bbb'
-						})
+						});
+
+					darkgrey
 						.data(data, opts)
 						.transform('linear', {
 							y: function(val, data, index) { return 20 + (index * 40); },
@@ -65,14 +81,16 @@
 						.draw();
 
 					// draw lightblue bars
-					var lightbluebars = loupe(div)
+					lightbluebars = lightbluebars || loupe(div)
 						.rect({
 							x: 100,
 							y: 40,
 							width: 105,
 							height: 10,
 							color: '#b0c4de'
-						})
+						});
+
+					lightbluebars
 						.data(data, opts)
 						.transform('linear', {
 							y: function(val, data, index) { return 27 + (index * 40); }, 
@@ -81,14 +99,16 @@
 						.draw();
 
 					// draw blue bars
-					var bluebars = loupe(div)
+					bluebars = bluebars || loupe(div)
 						.rect({
 							x: 100,
 							y: 40,
 							width: 100,
 							height: 10,
 							color: '#4682b4'
-						})
+						});
+
+					bluebars
 						.data(data, opts)
 						.transform('linear', {
 							y: function(val, data, index) { return 27 + (index * 40); }, 
@@ -96,47 +116,49 @@
 						})
 						.draw();
 
-					// draw ticks
-					for (var i=0; i<5; i++) {
-						for (var j=0; j<7; j++) {
+					if (first == true) {
+						// draw ticks
+						for (var i=0; i<5; i++) {
+							for (var j=0; j<7; j++) {
+								loupe(div)
+									.line({
+										x1: (j * 70) + 105,
+										y1: ((i * 40) + 44),
+										x2: (j * 70) + 105,
+										y2: ((i * 40) + 47),
+										stroke: 1,
+										strokeColor: 'black'
+									})
+									.text({
+										position: ( j ==0 ? 102 : ((j * 70) + 100)) + ',' + ((i * 40) + 55),
+										class: 'tick',
+										content: j * 10 + ''
+									})
+									.draw();
+							}	
+						}
+
+						// draw labels
+						for (var k=0,len=data.length; k<len; k++) {
 							loupe(div)
-								.line({
-									x1: (j * 70) + 105,
-									y1: ((i * 40) + 44),
-									x2: (j * 70) + 105,
-									y2: ((i * 40) + 47),
-									stroke: 1,
-									strokeColor: 'black'
+								.text({
+									position: '95, ' + (((k + 1) * 30) + (k * 10)),
+									style: 'text-anchor: end;',
+									class: 'title',
+									content: data[k].title
 								})
 								.text({
-									position: ( j ==0 ? 102 : ((j * 70) + 100)) + ',' + ((i * 40) + 55),
-									class: 'tick',
-									content: j * 10 + ''
+									position: '95, ' + (((k + 1) * 30) + (k * 10) + 10),
+									style: 'text-anchor: end;',
+									class: 'subtitle',
+									content: data[k].subtitle
 								})
 								.draw();
-						}	
-					}
-
-					// draw labels
-					for (var k=0,len=data.length; k<len; k++) {
-						loupe(div)
-							.text({
-								position: '95, ' + (((k + 1) * 30) + (k * 10)),
-								style: 'text-anchor: end;',
-								class: 'title',
-								content: data[k].title
-							})
-							.text({
-								position: '95, ' + (((k + 1) * 30) + (k * 10) + 10),
-								style: 'text-anchor: end;',
-								class: 'subtitle',
-								content: data[k].subtitle
-							})
-							.draw();
+						}
 					}
 				}
 
-				drawBulletChart();
+				drawBulletChart(true);
 
 				var button = peppy.query('button')[0];
 				button.addEventListener('click', drawBulletChart, false);

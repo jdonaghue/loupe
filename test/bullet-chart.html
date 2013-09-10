@@ -42,7 +42,7 @@
 						.transform('linear', {
 							y: function(val, data, index) { return 20 + (index * 40); }
 						})
-						.draw();
+						.draw({ animate_duration: 1000 });
 
 					// draw middle grey 
 					middlegrey = middlegrey || loupe(div)
@@ -60,7 +60,7 @@
 							y: function(val, data, index) { return 20 + (index * 40); },
 							width: null
 						})
-						.draw();
+						.draw({ animate_duration: 1000 });
 
 					// draw dark grey 
 					darkgrey = darkgrey || loupe(div)
@@ -78,7 +78,7 @@
 							y: function(val, data, index) { return 20 + (index * 40); },
 							width: null
 						})
-						.draw();
+						.draw({ animate_duration: 1000 });
 
 					// draw lightblue bars
 					lightbluebars = lightbluebars || loupe(div)
@@ -96,7 +96,7 @@
 							y: function(val, data, index) { return 27 + (index * 40); }, 
 							width: null
 						})
-						.draw();
+						.draw({ animate_duration: 1000 });
 
 					// draw blue bars
 					bluebars = bluebars || loupe(div)
@@ -114,7 +114,7 @@
 							y: function(val, data, index) { return 27 + (index * 40); }, 
 							width: null
 						})
-						.draw();
+						.draw({ animate_duration: 1000 });
 
 					if (first == true) {
 						// draw ticks

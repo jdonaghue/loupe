@@ -831,14 +831,14 @@ loupe_cls(loupe, {
 // Source: src/engines/engines.js
 loupe_cls(loupe, {
 
-	draw: function () {
+	draw: function (animate) {
 
 		var self = this;
 
 		self.engine = self.engine || 'svg';
 
 		if (self.engine == 'svg') {
-			return self.draw_svg();
+			return self.draw_svg(animate);
 		}
 
 		return self;
@@ -1270,7 +1270,7 @@ function loupe_get_map (type) {
 
 loupe_cls(loupe, {
 
-	draw_svg: function () {
+	draw_svg: function (animate) {
 
 		var self = this;
 
@@ -1298,8 +1298,11 @@ loupe_cls(loupe, {
 						el.appendChild(svg);
 					}
 
-					if (self.animate_on || shape.other.animate || shape._el) {
-						var shapeEl;
+					if (animate || self.animate_on || shape.other.animate) {
+						var shapeEl,
+							animateConfig = animate || self.other.animate || self;
+
+
 						if (shape._el) {
 							shapeEl = shape._el;
 						}
@@ -1331,8 +1334,8 @@ loupe_cls(loupe, {
 									prop: prop,
 									start: start || loupe_property_default[prop] || 0,
 									stop: stop || loupe_property_default[prop] || 0,
-									duration: self.animate_duration || shape.other.animate_duration || 400,
-									animate_method: shape.other.animate_method
+									duration: animateConfig.animate_duration || 400,
+									animate_method: animateConfig.animate_method
 								});
 							}
 						});
@@ -1344,14 +1347,8 @@ loupe_cls(loupe, {
  							}
 						});
 
-						var shapeEl;
-						if (shape._el) {
-							shapeEl = shape._el;
-						}
-						else {
-							shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.other ? shape.other.content : null);
-							svg.appendChild(shapeEl);
-						}
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.other ? shape.other.content : null);
+						svg.appendChild(shapeEl);
 
 						shape._el = shapeEl;
 

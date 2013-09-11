@@ -134,8 +134,8 @@ var loupe_color_to_hex_map = {
 	red: '#FF0000',
 	black: '#000000',
 	green: '#00FF00',
-	yellow: '#ffff00',
-	blue: '#0000ff'
+	yellow: '#FFFF00',
+	blue: '#0000FF'
 }
 // Source: src/color/random.js
 function loupe_random_color (seed) {
@@ -217,6 +217,24 @@ function loupe_get_divide (type) {
 		}
 	}
 }
+
+function loupe_get_compare (type) {
+
+	switch (type) {
+		case 'd': {
+			return loupe_d_compare;
+		}
+		case 'fill': {
+			return loupe_color_compare;	
+		}
+		case 'transform': {
+			return loupe_transform_compare;
+		}	
+		default: {
+			return loupe_numeric_compare;
+		}
+	}
+}
 // Source: src/math/d.js
 function loupe_d_add (d, dx) {
 	
@@ -236,6 +254,10 @@ function loupe_d_mult (d, dx) {
 function loupe_d_divide (d, dx) {
 	
 	return loupe_d_math(d, dx, 'divide');
+}
+
+function loupe_d_compare (a, b) {
+	
 }
 
 function loupe_d_math (d, dx, op) {
@@ -348,33 +370,32 @@ function loupe_color_divide (d, dx) {
 	return loupe_color_math(d, dx, 'divide');
 }
 
+function loupe_color_compare (a, b) {
+
+	var rgb;
+
+	a = loupe_normalize_color(a);
+	b = loupe_normalize_color(b);
+
+	if (a[0] > b[0] || a[1] > b[1] || a[2] > b[2]) {
+		return 1;
+	}
+	else {
+		if (a[0] < b[0] || a[1] < b[1] || a[2] < b[2]) {
+			return -1;
+		}
+		else {
+			return 0;
+		}
+	}
+}
+
 function loupe_color_math (d, dx, op) {
 
 	var rbg;
 
-	d = loupe_color_to_hex_map[d] || d;
-	dx = loupe_color_to_hex_map[dx] || dx;
-
-	if (d.indexOf('rgb') == 0) {
-		d = d.substring(4, d.length - 1);
-		d = d.split(',');
-	}
-	else {
-		d = loupe_hex_to_rgb_values(d);
-	}
-
-	if (isNaN(dx)) {
-		if (dx.indexOf('rgb') == 0) {
-			dx = dx.substring(4, dx.length - 1);
-			dx = dx.split(',');
-		}
-		else {
-			dx = loupe_hex_to_rgb_values(dx);
-		}
-	}
-	else {
-		dx = [dx, dx, dx];
-	}
+	d = loupe_normalize_color(d);
+	dx = loupe_normalize_color(dx);
 
 	if (op == 'add') {
 		d[0] = (d[0] * 1) + (dx[0] * 1);
@@ -404,6 +425,26 @@ function loupe_color_math (d, dx, op) {
 	rgb = 'rgb(' + d.join(',') + ')';
 
 	return rgb;
+}
+
+function loupe_normalize_color (color) {
+
+	color = loupe_color_to_hex_map[color] || color;
+
+	if (isNaN(color)) {
+		if (color.indexOf('rgb') == 0) {
+			color = color.substring(4, color.length - 1);
+			color = color.split(',');
+		}
+		else {
+			color = loupe_hex_to_rgb_values(color);
+		}
+	}
+	else {
+		color = [color, color, color];
+	}
+
+	return color;
 }
 
 function loupe_hex_to_rgb_values (hex) {
@@ -441,6 +482,10 @@ function loupe_transform_mult (d, dx) {
 function loupe_transform_divide (d, dx) {
 
 	return loupe_transform_math(d, dx, 'divide');
+}
+
+function loupe_transform_compare (a, b) {
+	
 }
 
 function loupe_transform_math(d, dx, op) {
@@ -506,6 +551,17 @@ function loupe_numeric_mult (a, b) {
 function loupe_numeric_divide (a, b) {
 	return a / b;
 }
+
+function loupe_numeric_compare (a, b) {
+
+	if (a > b) {
+		return 1;
+	}
+	else if (a < b) {
+		return -1;
+	}
+	return 0;
+}
 // Source: src/animation/timer.js
 function loupe_start_task (fn, args, scope, interval) {
 	
@@ -540,17 +596,22 @@ function loupe_animate (el, opts) {
 	var add = loupe_get_add(opts.prop),
 		sub = loupe_get_sub(opts.prop),
 		mult = loupe_get_mult(opts.prop),
+		compare = loupe_get_compare(opts.prop),
 		movingVal = sub(opts.stop, opts.start),
+		direction = compare(opts.stop, opts.start),
 		delta = 0,
 		elapsedTime = 0,
 		id = loupe_start_task(
 			function(el, prop, stop) {
 				delta = loupe_get_animation_easing(self.animate_method || opts.animate_method)(elapsedTime / opts.duration);
-				loupe_attr(el, prop, add(opts.start, mult(movingVal, delta)));
+				var newVal = add(opts.start, mult(movingVal, delta));
 
 				elapsedTime+=10;
-				if (elapsedTime > opts.duration) {
+				if (elapsedTime > opts.duration || (direction >= 0 ? compare(newVal, opts.stop) >= 0 : compare(newVal, opts.stop) < 0)) {
 					loupe_stop_task(id, opts.callback, opts.callback_args);
+				}
+				else {
+					loupe_attr(el, prop, newVal);
 				}
 			},
 			[el, opts.prop, opts.stop],
@@ -713,7 +774,7 @@ function loupe_linear_sync (self) {
 
 						var existing = self.queue[domKey] ? self.queue[domKey][shapeKey] ? self.queue[domKey][shapeKey][dKey] : null : null;
 
-						if (existing) {
+						if (existing && self.queue[domKey][shapeKey].length == self.analyzed_data.length) {
 							clone._el = existing._el;
 							clone.from = clone.from || {};
 							loupe_each(existing, function(val, key) {
@@ -1299,15 +1360,28 @@ loupe_cls(loupe, {
 					}
 
 					if (animate || self.animate_on || shape.other.animate) {
-						var shapeEl,
-							animateConfig = animate || self.other.animate || self;
 
+						var shapeEl,
+							animateConfig = animate || (shape.other ? (shape.other.animate || self) : self),
+							from = loupe_extend({}, shape.from);
 
 						if (shape._el) {
 							shapeEl = shape._el;
 						}
 						else {
-							shapeEl = loupe_createEl(loupe_svg_ns, shape.from);
+							loupe_each(from, function(fromProp, fromKey) {
+								if (loupe_is_array(fromProp)) {
+									from[fromKey] = fromProp[shape.dataIndex] || loupe_property_default[fromKey];
+								}
+							});
+
+							loupe_each(shape, function(shapeProp, shapeKey) {
+								if (!from[shapeKey]) {
+									from[shapeKey] = loupe_property_default[shapeKey] || shapeProp;
+								}
+							});
+
+							shapeEl = loupe_createEl(loupe_svg_ns, from);
 							svg.appendChild(shapeEl);
 						}
 
@@ -1316,21 +1390,27 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handler, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
 						});
+
+						shape.currentAnimation = shape.currentAnimation || {};
 						
 						loupe_each(shape, function(val, prop) {
 							if (prop in {cx: null, cy: null, r: null, d: null, fill: null, x:null, y:null, width: null, height: null, x1: null, x2: null, y1: null, y2: null}) {
 								var start, stop;
 
-								if (shape.from[prop]) {
-									start = loupe_is_array(shape.from[prop]) ? shape.from[prop][shape.dataIndex] || shape[prop] : shape.from[prop];
+								if (from[prop]) {
+									start = from[prop] || shape[prop];
 								}
 								else {
-									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] || shape[prop] : shape[prop];	
 								}
 							
-								stop = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+								stop = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];
+		
+								if (shape.from.currentAnimation && shape.from.currentAnimation[prop]) {
+									loupe_stop_task(shape.from.currentAnimation[prop]);
+								}
 
-								loupe_animate(shapeEl, {
+								shape.currentAnimation[prop] = loupe_animate(shapeEl, {
 									prop: prop,
 									start: start || loupe_property_default[prop] || 0,
 									stop: stop || loupe_property_default[prop] || 0,
@@ -1355,6 +1435,8 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handler, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
 						});
+
+						self.queue = [];
 					}
 				});
 			});

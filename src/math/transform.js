@@ -18,6 +18,10 @@ function loupe_transform_divide (d, dx) {
 	return loupe_transform_math(d, dx, 'divide');
 }
 
+function loupe_transform_compare (a, b) {
+	
+}
+
 function loupe_transform_math(d, dx, op) {
 
 	var type = d.substring(0, d.indexOf('(')),

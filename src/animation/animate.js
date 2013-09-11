@@ -12,17 +12,22 @@ function loupe_animate (el, opts) {
 	var add = loupe_get_add(opts.prop),
 		sub = loupe_get_sub(opts.prop),
 		mult = loupe_get_mult(opts.prop),
+		compare = loupe_get_compare(opts.prop),
 		movingVal = sub(opts.stop, opts.start),
+		direction = compare(opts.stop, opts.start),
 		delta = 0,
 		elapsedTime = 0,
 		id = loupe_start_task(
 			function(el, prop, stop) {
 				delta = loupe_get_animation_easing(self.animate_method || opts.animate_method)(elapsedTime / opts.duration);
-				loupe_attr(el, prop, add(opts.start, mult(movingVal, delta)));
+				var newVal = add(opts.start, mult(movingVal, delta));
 
 				elapsedTime+=10;
-				if (elapsedTime > opts.duration) {
+				if (elapsedTime > opts.duration || (direction >= 0 ? compare(newVal, opts.stop) >= 0 : compare(newVal, opts.stop) < 0)) {
 					loupe_stop_task(id, opts.callback, opts.callback_args);
+				}
+				else {
+					loupe_attr(el, prop, newVal);
 				}
 			},
 			[el, opts.prop, opts.stop],

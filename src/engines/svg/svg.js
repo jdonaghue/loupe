@@ -52,15 +52,28 @@ loupe_cls(loupe, {
 					}
 
 					if (animate || self.animate_on || shape.other.animate) {
-						var shapeEl,
-							animateConfig = animate || self.other.animate || self;
 
+						var shapeEl,
+							animateConfig = animate || (shape.other ? (shape.other.animate || self) : self),
+							from = loupe_extend({}, shape.from);
 
 						if (shape._el) {
 							shapeEl = shape._el;
 						}
 						else {
-							shapeEl = loupe_createEl(loupe_svg_ns, shape.from);
+							loupe_each(from, function(fromProp, fromKey) {
+								if (loupe_is_array(fromProp)) {
+									from[fromKey] = fromProp[shape.dataIndex] || loupe_property_default[fromKey];
+								}
+							});
+
+							loupe_each(shape, function(shapeProp, shapeKey) {
+								if (!from[shapeKey]) {
+									from[shapeKey] = loupe_property_default[shapeKey] || shapeProp;
+								}
+							});
+
+							shapeEl = loupe_createEl(loupe_svg_ns, from);
 							svg.appendChild(shapeEl);
 						}
 
@@ -69,21 +82,27 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handler, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
 						});
+
+						shape.currentAnimation = shape.currentAnimation || {};
 						
 						loupe_each(shape, function(val, prop) {
 							if (prop in {cx: null, cy: null, r: null, d: null, fill: null, x:null, y:null, width: null, height: null, x1: null, x2: null, y1: null, y2: null}) {
 								var start, stop;
 
-								if (shape.from[prop]) {
-									start = loupe_is_array(shape.from[prop]) ? shape.from[prop][shape.dataIndex] || shape[prop] : shape.from[prop];
+								if (from[prop]) {
+									start = from[prop] || shape[prop];
 								}
 								else {
-									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] || shape[prop] : shape[prop];	
 								}
 							
-								stop = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];	
+								stop = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] : shape[prop];
+		
+								if (shape.from.currentAnimation && shape.from.currentAnimation[prop]) {
+									loupe_stop_task(shape.from.currentAnimation[prop]);
+								}
 
-								loupe_animate(shapeEl, {
+								shape.currentAnimation[prop] = loupe_animate(shapeEl, {
 									prop: prop,
 									start: start || loupe_property_default[prop] || 0,
 									stop: stop || loupe_property_default[prop] || 0,
@@ -108,6 +127,8 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handler, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
 						});
+
+						self.queue = [];
 					}
 				});
 			});

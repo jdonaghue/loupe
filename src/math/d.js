@@ -18,6 +18,10 @@ function loupe_d_divide (d, dx) {
 	return loupe_d_math(d, dx, 'divide');
 }
 
+function loupe_d_compare (a, b) {
+	
+}
+
 function loupe_d_math (d, dx, op) {
 
 	if (d) {

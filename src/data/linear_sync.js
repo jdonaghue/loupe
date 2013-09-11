@@ -23,7 +23,7 @@ function loupe_linear_sync (self) {
 
 						var existing = self.queue[domKey] ? self.queue[domKey][shapeKey] ? self.queue[domKey][shapeKey][dKey] : null : null;
 
-						if (existing) {
+						if (existing && self.queue[domKey][shapeKey].length == self.analyzed_data.length) {
 							clone._el = existing._el;
 							clone.from = clone.from || {};
 							loupe_each(existing, function(val, key) {

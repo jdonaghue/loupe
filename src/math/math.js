@@ -69,3 +69,21 @@ function loupe_get_divide (type) {
 		}
 	}
 }
+
+function loupe_get_compare (type) {
+
+	switch (type) {
+		case 'd': {
+			return loupe_d_compare;
+		}
+		case 'fill': {
+			return loupe_color_compare;	
+		}
+		case 'transform': {
+			return loupe_transform_compare;
+		}	
+		default: {
+			return loupe_numeric_compare;
+		}
+	}
+}

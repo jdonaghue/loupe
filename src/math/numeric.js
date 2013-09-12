@@ -1,9 +1,9 @@
 function loupe_numeric_add (a, b) {
-	return a + b;
+	return (a * 1) + (b * 1);
 }
 
 function loupe_numeric_sub (a, b) {
-	return a - b;
+	return (a * 1) - (b * 1)
 }
 
 function loupe_numeric_mult (a, b) {

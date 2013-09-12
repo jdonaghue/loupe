@@ -22,7 +22,7 @@ function loupe_animate (el, opts) {
 				delta = loupe_get_animation_easing(self.animate_method || opts.animate_method)(elapsedTime / opts.duration);
 				var newVal = add(opts.start, mult(movingVal, delta));
 
-				elapsedTime+=10;
+				elapsedTime+=1;
 				if (elapsedTime > opts.duration || (direction >= 0 ? compare(newVal, opts.stop) >= 0 : compare(newVal, opts.stop) < 0)) {
 					loupe_stop_task(id, opts.callback, opts.callback_args);
 				}
@@ -32,7 +32,7 @@ function loupe_animate (el, opts) {
 			},
 			[el, opts.prop, opts.stop],
 			null,
-			10);
+			1);
 
 	return id;
 }

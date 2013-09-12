@@ -17,7 +17,7 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 			map = loupe_get_map(shape.tag);
 
 			if (loupe_is_function(val)) {
-				shape[map[key]] = val(shape[map[key]], data, index);
+				shape[map[key]] = val(shape[map[key]], data, index, shape);
 			}
 			else {
 				shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 

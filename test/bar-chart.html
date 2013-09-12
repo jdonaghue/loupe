@@ -6,61 +6,188 @@
 		<script src="../loupe.js"></script>
 		<script>
 			window.onload = function() {
-				var data = [1, 2, 3, 4, .7];
 
-				// draw the axes
-				loupe('div')
-					.line({
-						x1: 78,
-						y1: 20,
-						x2: 78,
-						y2: 220,
-						stroke: 1,
-						strokeColor: 'black'
-					})
-					.line({
-						x1: 78,
-						y1: 220,
-						x2: 700,
-						y2: 220,
-						stroke: 1,
-						strokeColor: 'black'
-					})
-					.draw();
+				var barChartBlue,
+					barChartGrey;
 
-				// draw x ticks
-				loupe('div')
-					.line({
-						x1: 148,
-						y1: 220,
-						x2: 148,
-						y2: 225,
-						stroke: 1,
-						strokeColor: 'black'
-					})
-					.data(data)
-					.transform('linear', {
-						x1: null,
-						x2: null
-					})
-					.draw();
+				function rand(min, max) {
+					return Math.round(min + Math.floor(Math.random() * (max - min)));
+				}
 
-				// draw y ticks
-				loupe('div')
-					.line({
-						x1: 73,
-						y1: 50,
-						x2: 78,
-						y2: 50,
-						stroke: 1,
-						strokeColor: 'black'
-					})
-					.data(data)
-					.transform('linear', {
-						y1: null,
-						y2: null
-					})
-					.draw();
+				function drawBarChart(first) {
+
+					var data = [{ title: 'Jobs Rate', subtitle: 'USD millions', value: rand(100, 240) / 100 }, 
+								{ title: 'Economy', subtitle: 'USD Trillions', value: rand(100, 240) / 100 }, 
+								{ title: 'Basketball', subtitle: 'Points', value: rand(100, 240) / 100 }, 
+								{ title: 'Shoes', subtitle: 'Size', value: rand(100, 240) / 100 }, 
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 },
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 },
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 },
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 },
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 },
+								{ title: 'Flights', subtitle: 'Landings', value: rand(100, 240) / 100 }],
+						opts = { reader: function(a) { return a }, replace: true },
+						div = peppy.query('div');
+
+					// draw the bar chart
+					barChartBlue = barChartBlue || loupe(div)
+						.rect({
+							x: 98,
+							y: 80,
+							width: 20,
+							height: 160,
+							color: '#b0c4de'
+						});
+
+					barChartBlue
+						.data(data, opts)
+						.transform('linear', {
+							x: function(val, data, index, shape) {
+								return (index * 60) + 98;
+							},
+							y: function(val, data, index, shape) {
+								val = val * data;
+								return val < 240 ? val : 240;	
+							},
+							height: function(val, data, index, shape) {
+								return 240 - shape.y;
+							}
+						})
+						.draw({ animate_duration: 500 });
+
+					barChartGrey = barChartGrey || loupe(div)
+						.rect({
+							x: 98,
+							y: 80,
+							width: 20,
+							height: 160,
+							color: '#ccc'
+						});
+
+					barChartGrey
+						.data(data, opts)
+						.transform('linear', {
+							x: function(val, data, index, shape) {
+								return (index * 60) + 128;
+							},
+							y: function(val, data, index, shape) {
+								val = val * data + 40;
+								return val < 240 ? val : 240;	
+							},
+							height: function(val, data, index, shape) {
+								return 240 - shape.y;
+							}
+						})
+						.draw({ animate_duration: 500 });
+
+					if (first == true) {
+
+						// draw the axes (x, y)
+						loupe(div)
+							.line({
+								x1: 78,
+								y1: 20,
+								x2: 78,
+								y2: 240,
+								stroke: 1,
+								strokeColor: 'black'
+							})
+							.text({
+								position: '375, 270',
+								content: 'Weight'
+							})
+							.line({
+								x1: 78,
+								y1: 240,
+								x2: 700,
+								y2: 240,
+								stroke: 1,
+								strokeColor: 'black'
+							})
+							.text({
+								transform: 'translate(30, 150) rotate(-90)',
+								content: 'Time'
+							})
+							.draw();
+
+						// draw x ticks
+						loupe(div)
+							.line({
+								x1: 118,
+								y1: 240,
+								x2: 118,
+								y2: 245,
+								stroke: 1,
+								strokeColor: 'black'
+							})
+							.data([1,2,3,4,5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15])
+							.transform('linear', {
+								x1: function(val, data, index) {
+									return val + (index * 40);
+								},
+								x2: function(val, data, index) {
+									return val + (index * 40);
+								},
+							})
+							.draw();
+
+						// draw y ticks
+						loupe(div)
+							.line({
+								x1: 73,
+								y1: 50,
+								x2: 78,
+								y2: 50,
+								stroke: 1,
+								strokeColor: 'black'
+							})
+							.data([1, 2, 3, 4, 5])
+							.transform('linear', {
+								y1: function(val, data, index) {
+									return val + (index * 40);
+								},
+								y2: function(val, data, index) {
+									return val + (index * 40);
+								}
+							})
+							.draw();
+
+						// draw labels
+						for (var i=0; i<15; i++) {
+							loupe(div)
+								.text({
+									class: 'label',
+									position: ((i * 40) + 100) + ', 255',
+									content: (i+1) + 'lbs'
+								})
+								.draw();
+						}
+
+						for (var i=0; i<5; i++) {
+							loupe(div)
+								.text({
+									class: 'label',
+									position: '35, ' + ((i * 40) + 50),
+									content: (i+1) + ':00PM'
+								})
+								.draw();
+						}
+					}
+				}
+
+				drawBarChart(true);
+
+				var button = peppy.query('button')[0];
+				button.addEventListener('click', drawBarChart, false);
+
+				var animate = peppy.query('button[name=animate]')[0];
+				animate.addEventListener('click', function() {
+					drawBarChart();
+					setInterval(function() {
+						drawBarChart();
+					}, 2000);
+				}, false);
+					
 			}
 		</script>
 
@@ -73,15 +200,28 @@
 			h1 {
 				font-size: 65px;
 			}
+			
 			.container {
 				width: 750px;
 				height: 300px;
 				border: 1px solid #ccc;
 			}
+
+			.label {
+				font-size: 10px;
+			}
+
+			button {
+				margin-left: 5px;
+				margin-top: 5px;
+			}
 		</style>
 	</head>
 	<body>
 		<h1>Bar Chart</h1>
-		<div class="container"></div>
+		<div class="container">
+			<button>update</button>
+			<button name="animate">animate</button>
+		</div>
 	</body>
 </html>

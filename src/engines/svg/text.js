@@ -3,6 +3,7 @@ var loupe_text_svg_map = loupe_extend({
 	y: 'y',
 	dx: 'dx',
 	dy: 'dy',
+	textAnchor: 'text-anchor',
 	rotate: 'rotate',
 	textLength: 'textLength',
 	lengthAdjust: 'lengthAdjust'
@@ -19,7 +20,7 @@ loupe_cls(loupe, {
 			};
 
 		for (var prop in props) {
-			var mapped_prop = loupe_polyline_svg_map[prop];
+			var mapped_prop = loupe_text_svg_map[prop];
 			if (mapped_prop) {
 				config[mapped_prop] = props[prop];
 			}

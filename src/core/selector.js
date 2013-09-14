@@ -1,9 +1,9 @@
 loupe_cls(loupe, {
 
-	sEngine: window.peppy ? peppy.query : (_doc.querySelectorAll || loupe_noop),
+	sEngine: window.peppy ? peppy.query : undefined,
 
 	query: function (selector, context) {
 
-		return this.sEngine(selector, context);
+		return this.sEngine ? this.sEngine(selector, context) : (context || _doc).querySelectorAll(selector);
 	}
 });

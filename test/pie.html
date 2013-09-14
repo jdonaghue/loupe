@@ -8,62 +8,31 @@
 		<script>
 			window.onload = function() {
 
-				function pieTransform (shape, prevShape, data, analyzed_data, index) {
-
-					var pi = Math.PI,
-						rad = pi / 180,
-						r = shape.r,
-						cx = shape.cx,
-						cy = shape.cy,
-						angleStart = prevShape && prevShape.angleEnd ? prevShape.angleEnd : 0,
-						angleEnd =  angleStart + (360 * data / analyzed_data.metrics.sum),
-						x1 = cx + r * Math.cos(-angleStart * rad),
-						x2 = cx + r * Math.cos(-angleEnd * rad),
-						y1 = cy + r * Math.sin(-angleStart * rad),
-						y2 = cy + r * Math.sin(-angleEnd * rad);
-
-					shape.angleStart = angleStart;
-					shape.angleEnd = angleEnd;
-					shape.d = ['M' + cx, cy + 'L' + x1, y1 + 'A' + r, r, 0, +(angleEnd - angleStart > 180), 0, x2, y2 + 'z'].join(',');
-					shape.from.d = shape.from.d.split(',');
-					shape.from.d[5] = +(angleEnd - angleStart > 180);
-					shape.from.d = shape.from.d.join(',');
-
-					shape.fill = (shape.fill instanceof Array ? shape.fill[index] : loupe.randomColor())
-						 || (shape.other.rainbow ? loupe.randomColor() : '#FFF');
-
-					return shape;
-				}
-
 				function rand(min, max) {
 					return Math.round(min + Math.floor(Math.random() * (max - min)));
 				}
 
-				var data = [{ title: 'Jobs Rate', subtitle: 'USD millions', value: rand(10, 800) / 100 }, 
+				var data = [
+						{ title: 'Jobs Rate', subtitle: 'USD millions', value: rand(10, 800) / 100 }, 
 						{ title: 'Economy', subtitle: 'USD Trillions', value: rand(10, 600) / 100 }, 
 						{ title: 'Basketball', subtitle: 'Points', value: rand(10, 1000) / 100 }, 
 						{ title: 'Shoes', subtitle: 'Size', value: rand(100, 400) / 100 }, 
-						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 300) / 100 },
-						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 200) / 100 },
-						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 400) / 100 },
-						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 100) / 100 }],
+						{ title: 'Food', subtitle: 'Pizza', value: rand(10, 300) / 100 },
+						{ title: 'Clothes', subtitle: 'Shirts', value: rand(10, 200) / 100 },
+						{ title: 'Fruit', subtitle: 'Apples', value: rand(10, 400) / 100 },
+						{ title: 'Cars', subtitle: 'BMW', value: rand(10, 100) / 100 }
+					],
 					opts = { reader: function(a) { return a }, replace: true },
 					div = peppy.query('div');
 
 				loupe('div')
 					.pie({
 						from: {
-							strokeColor: 'yellow',
-							'stroke-width':0,
-							d: 'M100,100L100,100A0,0,0,0,0,10,10z',
-							fill: ['black', 'black', 'black', 'black']
+							d: 'M250,250L200,200A0,0,0,0,0,10,10z'
 						},
 						centerX: 250,
 						centerY: 250,
 						radius: 200,
-						color: ['red', 'yellow', 'blue', 'green'],
-						strokeColor: 'yellow',
-						stroke:'0',
 						rainbow: true,
 						animate: {
 							animate_duration: 500
@@ -73,19 +42,38 @@
 							duration: 100
 						},
 						events: {
-							click: function(e, shape) {
-								alert(shape.tag);
+							click: function(e, shape, data) {
+								alert(shape._tag + data.value);
 							},
-							mouseover: function(e, shape) {
-								console.log('in');
+							mouseover: function(e, shape, data) {
+								var d = peppy.query('#infoPanel')[0];
+
+								if (!d) {
+									d = document.createElement('div');
+									d.id = 'infoPanel';
+								}
+
+								d.innerHTML = [
+									'<h4>',
+										data.title,
+									'</h4>',
+									'<small>',
+										data.subtitle,
+									'</small>',
+									'<br/><br/>',
+									data.value
+								].join('');
+								peppy.query('div')[0].appendChild(d);
 							},
-							mouseout: function(e, shape) {
-								console.log('out');
+							mouseout: function(e, shape, data) {
+
+								var title = peppy.query('#infoPanel')[0];
+								title.parentNode.removeChild(title);
 							}
 						}
 					})
 					.data(data, opts)
-					.transform('linear', pieTransform)
+					.transform('linear')
 					.draw({ animate_duration: 500 });
 			}
 		</script>
@@ -99,11 +87,25 @@
 			h1 {
 				font-size: 65px;
 			}
+			h4 {
+				margin: 5px;
+			}
 
 			.container {
 				width: 500px;
 				height: 500px;
 				border: 1px solid #ccc;
+			}
+
+			#infoPanel {
+				width: 100px;
+				height: 100px;
+				border: 1px solid #000;
+				background: #fff;
+				position: fixed;
+				text-align: center;
+				left: 477px;
+				top: 166px;
 			}
 		</style>
 	</head>

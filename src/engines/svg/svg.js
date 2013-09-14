@@ -41,7 +41,7 @@ loupe_cls(loupe, {
 
 		loupe_each(self.queue, function (shape_queue, key, index) {
 			var el = self.dom[index],
-				svg = self.sEngine('svg', el)[0];
+				svg = self.query('svg', el)[0];
 
 			if (self.width || self.height) {
 				loupe_style(el, { 
@@ -98,8 +98,12 @@ loupe_cls(loupe, {
 
 						shape._el = shapeEl;
 
-						loupe_each(shape.other.events, function(handler, eventType) {
-							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						loupe_each(shape.other.events, function(handlers, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { 
+								loupe_each(handlers, function(h) {
+									return h(e, shape, self.original_data[shape.dataIndex]); 
+								});
+							});
 						});
 
 						shape.currentAnimation = shape.currentAnimation || {};
@@ -139,8 +143,12 @@ loupe_cls(loupe, {
 
 						shape._el = shapeEl;
 
-						loupe_each(shape.other.events, function(handler, eventType) {
-							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						loupe_each(shape.other.events, function(handlers, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { 
+								loupe_each(handlers, function(h) {
+									return h(e, shape, self.original_data[shape.dataIndex]); 
+								});
+							});
 						});
 
 						self.queue = [];

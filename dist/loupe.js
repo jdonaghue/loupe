@@ -100,11 +100,11 @@ function loupe_each(list, fn) {
 // Source: src/core/selector.js
 loupe_cls(loupe, {
 
-	sEngine: window.peppy ? peppy.query : (_doc.querySelectorAll || loupe_noop),
+	sEngine: window.peppy ? peppy.query : undefined,
 
 	query: function (selector, context) {
 
-		return this.sEngine(selector, context);
+		return this.sEngine ? this.sEngine(selector, context) : (context || _doc).querySelectorAll(selector);
 	}
 });
 // Source: src/event/event.js
@@ -855,7 +855,10 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 	if (loupe_is_function(opts)) {
 		loupe_extend(shape, opts(shape, prevShape, data, analyzed_data, index), true);
 	}
-	else { // for basic shapes
+	else if (loupe[shape._tag + 'Transform']) {
+		loupe_extend(shape, loupe[shape._tag + 'Transform'](shape, prevShape, data, analyzed_data, index), true);
+	}
+	else { 
 		loupe_each(opts, function(val, key) {
 			map = loupe_get_map(shape.tag);
 
@@ -938,6 +941,49 @@ var loupe_property_default = {
 	fill: '#FFF'
 }
 
+loupe.extend(loupe, {
+
+	shape: function(shape, props, map, special, after) {
+
+		var self = this;
+
+		for (var prop in props) {
+			var mapped_prop = map[prop];
+			if (mapped_prop) {
+				shape[mapped_prop] = props[prop];
+			}
+			else if (special && prop in special) {
+				special[prop](shape, props[prop]);
+			}
+			else if (prop == 'from') {
+				shape.from = loupe.override({}, props[prop]);
+			}
+			else if (prop == 'events') {
+				shape.other.events = {};
+				for (var t in props[prop]) {
+					var e = props[prop][t];
+					shape.other.events[t] = e instanceof Array ? e : [e];
+				};
+			}
+			else {
+				shape.other[prop] = props[prop];
+			}
+		}
+
+		if (after) {
+			loupe_each(after, function(a) {
+				a(shape);
+			});
+		}	
+
+		self.shapes.push(shape);
+
+		loupe_sync_data(self);
+
+		return shape;
+	}
+});
+
 loupe_extend(loupe, {
 
 	shapeSvgMap: loupe_shape_svg_map,
@@ -971,25 +1017,11 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_text_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
+		self.shape(config, props, loupe_text_svg_map, { 
+			position: function(config, val) { 
+				config.transform = 'translate(' + val + ')';
 			}
-			else if (prop == 'position') {
-				config.transform = 'translate(' + props[prop] + ')';
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		});
 		
 		return self;
 	}
@@ -1017,22 +1049,7 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_line_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		self.shape(config, props, loupe_line_svg_map);
 		
 		return self;
 	}
@@ -1059,22 +1076,7 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_circle_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		self.shape(config, props, loupe_circle_svg_map);
 		
 		return self;
 	}
@@ -1099,22 +1101,7 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_polyline_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		self.shape(config, props, loupe_polyline_svg_map);
 		
 		return self;
 	}
@@ -1139,22 +1126,7 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_polygon_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		self.shape(config, props, loupe_polygon_svg_map);
 		
 		return self;
 	}
@@ -1184,22 +1156,7 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_rect_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}		
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		self.shape(config, props, loupe_rect_svg_map);
 
 		return self;
 	}
@@ -1231,39 +1188,25 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_path_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}	
-
-		if (!config.d) {
-			config.d = '';
-			if (config.M) {
-				config.d = 'M' + config.M;
-			}
-			if (config.A) {
-				config.d += 'A' + config.A;
-			}
-			if (config.L) {
-				config.d += 'L' + config.L;
-			}
-			if (config.C) {
-				config.d += 'C' + config.C;
-			}
-			config.d += 'Z';
-		}	
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		config = self.shape(config, props, loupe_path_svg_map, null, [
+			function(config) {
+				if (!config.d) {
+					config.d = '';
+					if (config.M) {
+						config.d = 'M' + config.M;
+					}
+					if (config.A) {
+						config.d += 'A' + config.A;
+					}
+					if (config.L) {
+						config.d += 'L' + config.L;
+					}
+					if (config.C) {
+						config.d += 'C' + config.C;
+					}
+					config.d += 'Z';
+				}	
+			}]);
 		
 		return self;
 	}
@@ -1312,7 +1255,7 @@ loupe_cls(loupe, {
 
 		loupe_each(self.queue, function (shape_queue, key, index) {
 			var el = self.dom[index],
-				svg = self.sEngine('svg', el)[0];
+				svg = self.query('svg', el)[0];
 
 			if (self.width || self.height) {
 				loupe_style(el, { 
@@ -1369,8 +1312,12 @@ loupe_cls(loupe, {
 
 						shape._el = shapeEl;
 
-						loupe_each(shape.other.events, function(handler, eventType) {
-							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						loupe_each(shape.other.events, function(handlers, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { 
+								loupe_each(handlers, function(h) {
+									return h(e, shape, self.original_data[shape.dataIndex]); 
+								});
+							});
 						});
 
 						shape.currentAnimation = shape.currentAnimation || {};
@@ -1410,8 +1357,12 @@ loupe_cls(loupe, {
 
 						shape._el = shapeEl;
 
-						loupe_each(shape.other.events, function(handler, eventType) {
-							loupe_event_bind(shapeEl, eventType, function(e) { handler(e, shape); });
+						loupe_each(shape.other.events, function(handlers, eventType) {
+							loupe_event_bind(shapeEl, eventType, function(e) { 
+								loupe_each(handlers, function(h) {
+									return h(e, shape, self.original_data[shape.dataIndex]); 
+								});
+							});
 						});
 
 						self.queue = [];

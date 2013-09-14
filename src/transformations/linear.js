@@ -12,6 +12,9 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 	if (loupe_is_function(opts)) {
 		loupe_extend(shape, opts(shape, prevShape, data, analyzed_data, index), true);
 	}
+	else if (loupe[shape._tag + 'Transform']) {
+		loupe_extend(shape, loupe[shape._tag + 'Transform'](shape, prevShape, data, analyzed_data, index), true);
+	}
 	else { 
 		loupe_each(opts, function(val, key) {
 			map = loupe_get_map(shape.tag);

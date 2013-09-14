@@ -67,7 +67,6 @@ module.exports = function(grunt) {
 				},
 				options: {
 					compress: { evaluate: false },
-					sourceMap: "dist/loupe.min.map",
 					beautify: {
 						ascii_only: true
 					}

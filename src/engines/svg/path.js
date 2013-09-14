@@ -24,39 +24,25 @@ loupe_cls(loupe, {
 				other: {}
 			};
 
-		for (var prop in props) {
-			var mapped_prop = loupe_path_svg_map[prop];
-			if (mapped_prop) {
-				config[mapped_prop] = props[prop];
-			}
-			else if (prop == 'from') {
-				config.from = props[prop];
-			}
-			else {
-				config.other[prop] = props[prop];
-			}
-		}	
-
-		if (!config.d) {
-			config.d = '';
-			if (config.M) {
-				config.d = 'M' + config.M;
-			}
-			if (config.A) {
-				config.d += 'A' + config.A;
-			}
-			if (config.L) {
-				config.d += 'L' + config.L;
-			}
-			if (config.C) {
-				config.d += 'C' + config.C;
-			}
-			config.d += 'Z';
-		}	
-
-		self.shapes.push(config);
-
-		loupe_sync_data(self);
+		config = self.shape(config, props, loupe_path_svg_map, null, [
+			function(config) {
+				if (!config.d) {
+					config.d = '';
+					if (config.M) {
+						config.d = 'M' + config.M;
+					}
+					if (config.A) {
+						config.d += 'A' + config.A;
+					}
+					if (config.L) {
+						config.d += 'L' + config.L;
+					}
+					if (config.C) {
+						config.d += 'C' + config.C;
+					}
+					config.d += 'Z';
+				}	
+			}]);
 		
 		return self;
 	}

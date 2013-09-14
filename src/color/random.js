@@ -5,3 +5,8 @@ function loupe_random_color (seed) {
 
 	return 'rgb(' + r + ',' + g + ',' + b + ')';
 }
+
+loupe_extend(loupe, {
+
+	randomColor: loupe_random_color
+});

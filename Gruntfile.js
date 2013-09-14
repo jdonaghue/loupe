@@ -15,14 +15,14 @@ module.exports = function(grunt) {
 				files: {
 					'dist/loupe.js': [
 						'src/start.js',  
-						'src/core/extend.js',
-						'src/core/cls.js',
-						'src/core/each.js',
 						'src/core/isFunction.js',
 						'src/core/isArray.js',
 						'src/core/fn.js',
 						'src/core/noop.js',
 						'src/core/loupe.js',
+						'src/core/extend.js',
+						'src/core/cls.js',
+						'src/core/each.js',
 						'src/core/selector.js',
 						'src/event/event.js',
 						'src/color/hexMap.js',
@@ -53,7 +53,6 @@ module.exports = function(grunt) {
 						'src/engines/svg/polygon.js',
 						'src/engines/svg/rect.js',
 						'src/engines/svg/path.js',
-						'src/engines/svg/pie.js',
 						'src/engines/svg/svg.js',
 						'src/end.js'
 					],

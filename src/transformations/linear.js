@@ -9,10 +9,10 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 		}
 	});
 
-	if (shape._tag == 'pie') {
-		shape = loupe_path_to_pie(shape, prevShape, data, analyzed_data, index);
+	if (loupe_is_function(opts)) {
+		loupe_extend(shape, opts(shape, prevShape, data, analyzed_data, index), true);
 	}
-	else { // for basic shapes
+	else { 
 		loupe_each(opts, function(val, key) {
 			map = loupe_get_map(shape.tag);
 

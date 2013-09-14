@@ -13,3 +13,8 @@ function loupe_cls(ctor, props) {
 		loupe_extend(ctor.prototype, props);
 	}
 }
+
+loupe_extend(loupe, {
+
+	extend: loupe_cls
+})

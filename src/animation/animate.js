@@ -37,22 +37,7 @@ function loupe_animate (el, opts) {
 	return id;
 }
 
-loupe_cls(loupe, {
+loupe_extend(loupe, {
 
-	animate: function (opts) {
-
-		var self = this;
-
-		self.animate_on = true;
-		self.animate_method = 'linear';
-		self.animate_duration = 200;
-
-		if (opts) {
-			self.animate_synchronous = opts.synchronous || false;
-			self.animate_method = opts.easing || 'linear';
-			self.animate_properties = opts.props;
-			self.animate_duration = opts.duration || 200;
-		}
-		return self;
-	}
+	animate: loupe_animate
 });

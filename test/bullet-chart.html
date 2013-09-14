@@ -162,6 +162,14 @@
 
 				var button = peppy.query('button')[0];
 				button.addEventListener('click', drawBulletChart, false);
+
+				var animate = peppy.query('button[name=animate]')[0];
+				animate.addEventListener('click', function() {
+					drawBulletChart();
+					setInterval(function() {
+						drawBulletChart();
+					}, 2000);
+				}, false);
 			}
 		</script>
 
@@ -205,6 +213,7 @@
 		<h1>Bullet Chart</h1>
 		<div class="container">
 			<button>update</button>
+			<button name="animate">animate</button>
 		</div>
 	</body>
 </html>

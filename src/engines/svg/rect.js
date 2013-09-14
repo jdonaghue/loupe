@@ -5,7 +5,12 @@ var loupe_rect_svg_map = loupe_extend({
 	ry: 'ry',
 	width: 'width',
 	height: 'height'
-}, loupe_shape);
+}, loupe_shape_svg_map);
+
+loupe_extend(loupe, {
+
+	rectSvgMap: loupe_rect_svg_map
+});
 
 loupe_cls(loupe, {
 

@@ -25,3 +25,10 @@ function loupe_remove_attr (el, key, ns) {
 		el.removeAttribute(key);
 	}
 }
+
+loupe_extend(loupe, {
+
+	attr: loupe_attr,
+
+	removeAttr: loupe_remove_attr
+});

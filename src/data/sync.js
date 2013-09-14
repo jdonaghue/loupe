@@ -6,3 +6,8 @@ function loupe_sync_data(self) {
 		self.queue = loupe_linear_sync(self);
 	}
 }
+
+loupe_extend(loupe, {
+
+	syncData: loupe_sync_data
+})

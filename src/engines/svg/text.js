@@ -7,7 +7,12 @@ var loupe_text_svg_map = loupe_extend({
 	rotate: 'rotate',
 	textLength: 'textLength',
 	lengthAdjust: 'lengthAdjust'
-}, loupe_shape);
+}, loupe_shape_svg_map);
+
+loupe_extend(loupe, {
+
+	textSvgMap: loupe_text_svg_map
+});
 
 loupe_cls(loupe, {
 

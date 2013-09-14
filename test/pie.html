@@ -4,8 +4,51 @@
 		<title>Pie Chart</title>
 		<script src="../../Peppy/peppy.js"></script>
 		<script src="../loupe.js"></script>
+		<script src="pie.js"></script>
 		<script>
 			window.onload = function() {
+
+				function pieTransform (shape, prevShape, data, analyzed_data, index) {
+
+					var pi = Math.PI,
+						rad = pi / 180,
+						r = shape.r,
+						cx = shape.cx,
+						cy = shape.cy,
+						angleStart = prevShape && prevShape.angleEnd ? prevShape.angleEnd : 0,
+						angleEnd =  angleStart + (360 * data / analyzed_data.metrics.sum),
+						x1 = cx + r * Math.cos(-angleStart * rad),
+						x2 = cx + r * Math.cos(-angleEnd * rad),
+						y1 = cy + r * Math.sin(-angleStart * rad),
+						y2 = cy + r * Math.sin(-angleEnd * rad);
+
+					shape.angleStart = angleStart;
+					shape.angleEnd = angleEnd;
+					shape.d = ['M' + cx, cy + 'L' + x1, y1 + 'A' + r, r, 0, +(angleEnd - angleStart > 180), 0, x2, y2 + 'z'].join(',');
+					shape.from.d = shape.from.d.split(',');
+					shape.from.d[5] = +(angleEnd - angleStart > 180);
+					shape.from.d = shape.from.d.join(',');
+
+					shape.fill = (shape.fill instanceof Array ? shape.fill[index] : loupe.randomColor())
+						 || (shape.other.rainbow ? loupe.randomColor() : '#FFF');
+
+					return shape;
+				}
+
+				function rand(min, max) {
+					return Math.round(min + Math.floor(Math.random() * (max - min)));
+				}
+
+				var data = [{ title: 'Jobs Rate', subtitle: 'USD millions', value: rand(10, 800) / 100 }, 
+						{ title: 'Economy', subtitle: 'USD Trillions', value: rand(10, 600) / 100 }, 
+						{ title: 'Basketball', subtitle: 'Points', value: rand(10, 1000) / 100 }, 
+						{ title: 'Shoes', subtitle: 'Size', value: rand(100, 400) / 100 }, 
+						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 300) / 100 },
+						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 200) / 100 },
+						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 400) / 100 },
+						{ title: 'Flights', subtitle: 'Landings', value: rand(10, 100) / 100 }],
+					opts = { reader: function(a) { return a }, replace: true },
+					div = peppy.query('div');
 
 				loupe('div')
 					.pie({
@@ -20,7 +63,7 @@
 						radius: 200,
 						color: ['red', 'yellow', 'blue', 'green'],
 						strokeColor: 'yellow',
-						stroke:'3',
+						stroke:'0',
 						rainbow: true,
 						animate: {
 							animate_duration: 500
@@ -41,15 +84,9 @@
 							}
 						}
 					})
-					.data([10,2,3,4, 7,100])
-					.transform('linear', { 
-						radius: null, 
-						centerX: function(val, data, index) { return val * data + (index % 2 == 0 ? 0 : 100); }, 
-						centerY: null, 
-						d: null,
-						color: null
-					})
-					.draw();
+					.data(data, opts)
+					.transform('linear', pieTransform)
+					.draw({ animate_duration: 500 });
 			}
 		</script>
 

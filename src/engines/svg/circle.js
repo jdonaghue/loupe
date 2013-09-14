@@ -2,7 +2,12 @@ var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
 	centerY: 'cy',
 	radius: 'r'
-}, loupe_shape);
+}, loupe_shape_svg_map);
+
+loupe_extend(loupe, {
+
+	circleSvgMap: loupe_circle_svg_map
+});
 
 loupe_cls(loupe, {
 

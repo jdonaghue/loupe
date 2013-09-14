@@ -7,7 +7,12 @@ var loupe_path_svg_map = loupe_extend({
 	arcTo: 'A',
 	lineTo: 'L',
 	curveTo: 'C'
-}, loupe_shape);
+}, loupe_shape_svg_map);
+
+loupe_extend(loupe, {
+
+	pathSvgMap: loupe_path_svg_map
+});
 
 loupe_cls(loupe, {
 

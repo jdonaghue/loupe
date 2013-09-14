@@ -12,3 +12,10 @@ function loupe_stop_task (taskId, callback, callback_args) {
 		callback.apply(null, callback_args);
 	}
 }
+
+loupe_extend(loupe, {
+
+	startTask: loupe_start_task,
+
+	stopTask: loupe_stop_task
+})

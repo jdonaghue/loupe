@@ -3,7 +3,12 @@ var loupe_line_svg_map = loupe_extend({
 	x2: 'x2',
 	y1: 'y1',
 	y2: 'y2'
-}, loupe_shape);
+}, loupe_shape_svg_map);
+
+loupe_extend(loupe, {
+
+	lineSvgMap: loupe_line_svg_map
+});
 
 loupe_cls(loupe, {
 

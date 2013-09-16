@@ -8,7 +8,7 @@ function loupe_linear_sync (self) {
 			loupe_each(self.shapes, function(shape, shapeKey) {
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
-					if (dKey != 'metrics' && dKey != 'type') {
+					if (!isNaN(dKey)) {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
 							if (typeof val == 'object') {

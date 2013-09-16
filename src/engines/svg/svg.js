@@ -62,6 +62,9 @@ loupe_cls(loupe, {
 
 			loupe_each(shape_queue, function (shapes) {
 				loupe_each(shapes, function(shape) {
+					if (shape.ignore) {
+						return true;
+					}
 
 					if (animate || self.animate_on || shape.other.animate) {
 

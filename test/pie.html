@@ -4,7 +4,7 @@
 		<title>Pie Chart</title>
 		<script src="../../Peppy/peppy.js"></script>
 		<script src="../loupe.js"></script>
-		<script src="pie.js"></script>
+		<script src="../plugins/pie.js"></script>
 		<script>
 			window.onload = function() {
 
@@ -25,7 +25,7 @@
 					opts = { reader: function(a) { return a }, replace: true },
 					div = peppy.query('div');
 
-				loupe('div')
+				loupe(div)
 					.pie({
 						from: {
 							d: 'M250,250L200,200A0,0,0,0,0,10,10z'
@@ -34,9 +34,6 @@
 						centerY: 250,
 						radius: 200,
 						rainbow: true,
-						animate: {
-							animate_duration: 500
-						},
 						hoverBounce: { 
 							offset: 10,
 							duration: 100
@@ -63,7 +60,7 @@
 									'<br/><br/>',
 									data.value
 								].join('');
-								peppy.query('div')[0].appendChild(d);
+								div[0].appendChild(d);
 							},
 							mouseout: function(e, shape, data) {
 

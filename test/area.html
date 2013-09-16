@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Area Chart</title>
+		<script src="../../Peppy/peppy.js"></script>
+		<script src="../loupe.js"></script>
+		<script src="../plugins/area.js"></script>
+		<script>
+			window.onload = function() {
+
+				function rand(min, max) {
+					return Math.round(min + Math.floor(Math.random() * (max - min)));
+				}
+
+				var data = [
+						{ title: 'Jobs Rate', subtitle: 'USD millions', value: { x: rand(1, 15), y: '2010-11-11 16:23:00'} }, 
+						{ title: 'Economy', subtitle: 'USD Trillions', value: { x: rand(1, 15), y: '2010-11-11 17:23:00'} }, 
+						{ title: 'Basketball', subtitle: 'Points', value: { x: rand(1, 15), y: '2010-11-11 13:23:00'} }, 
+						{ title: 'Shoes', subtitle: 'Size', value: { x: rand(1, 15), y: '2010-11-11 16:23:00'} }, 
+						{ title: 'Food', subtitle: 'Pizza', value: { x: rand(1, 15), y: '2010-11-11 14:23:00'} },
+						{ title: 'Clothes', subtitle: 'Shirts', value: { x: rand(1, 15), y: '2010-11-11 15:23:00'} },
+						{ title: 'Fruit', subtitle: 'Apples', value: { x: rand(1, 15), y: '2010-11-11 13:23:00'} }
+					],
+					dataOpts = { 
+						reader: function(a) { return a }, 
+						replace: true, 
+						transformer: { 
+							
+							y: function(val) {
+								var parts = val.split(' ');
+									dateParts = parts[0].split('-'),
+									timeParts = parts[1].split(':');
+								return new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
+							}
+						},
+						analyzer: function(self, data) {
+							
+							var analyzed = [],
+								analyzedX = [],
+								analyzedY = [],
+								x = [].concat(data),
+								y = [].concat(data),
+								tmp = [];
+
+							for (var i=0,len=data.length; i<len; i++) {
+								x[i].index = i;
+								y[i].index = i;
+							}
+
+							x.sort(function(a, b) {
+								if (a.x < b.x) {
+									return -1;
+								}
+								else if (a.x > b.x) {
+									return 1;
+								}
+								return 0;
+							});
+
+							y.sort(function(a, b) {
+								if (a.y < b.y) {
+									return -1;
+								}
+								else if (a.y > b.y) {
+									return 1;
+								}
+								return 0;
+							});
+
+							for (var i=0,len=data.length; i<len; i++) {
+								analyzedX.push({ 
+									index: x[i].index,
+									x: (x[i].x * 40) + 85
+								});
+
+								analyzedY.push({
+									index: y[i].index,
+									y: (y[y.length-1].y.getTime()- y[i].y.getTime()) / (y[y.length - 1].y.getTime() - y[0].y.getTime()) * 240
+								});
+							}
+
+							analyzedX.sort(function(a, b) {
+								if (a.index < b.index) {
+									return -1;
+								}
+								else if (a.index > b.index) {
+									return 1;
+								}
+								return 0;
+							});
+							
+							analyzedY.sort(function(a, b) {
+								if (a.index < b.index) {
+									return -1;
+								}
+								else if (a.index > b.index) {
+									return 1;
+								}
+								return 0;
+							});
+
+							for (var i=0,len=data.length; i<len; i++) {
+								
+								analyzed.push({
+									x: analyzedX[i].x,
+									y: analyzedY[i].y
+								});
+							}
+
+							analyzed.sort(function(a, b) {
+								if (a.x < b.x) {
+									return -1;
+								}
+								else if (a.x > b.x) {
+									return 1;
+								}
+								return 0;
+							});
+							
+							return analyzed;
+						}
+					},
+					div = peppy.query('div');
+
+				loupe(div)
+					.area({
+						d: 'M 78 240 L 78 240 Z',
+						color: '#b0c4de'
+					})
+					.data(data, dataOpts)
+					.transform('linear')
+					.draw();
+
+				// draw the axes (x, y)
+				loupe(div)
+					.line({
+						x1: 78,
+						y1: 20,
+						x2: 78,
+						y2: 240,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.text({
+						position: '375, 270',
+						content: 'Weight'
+					})
+					.line({
+						x1: 78,
+						y1: 240,
+						x2: 700,
+						y2: 240,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.text({
+						transform: 'translate(30, 150) rotate(-90)',
+						content: 'Time'
+					})
+					.draw();
+
+				// draw x ticks
+				loupe(div)
+					.line({
+						x1: 118,
+						y1: 240,
+						x2: 118,
+						y2: 245,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.data(data)
+					.transform('linear', {
+						x1: function(val, data, index) {
+							return (data.value.x * 40) + 85;
+						},
+						x2: function(val, data, index) {
+							return (data.value.x * 40) + 85	;
+						}
+					})
+					.draw();
+
+				data.sort(function(a, b) {
+					if (a.value.y < b.value.y) {
+						return 1;
+					}
+					else if (a.value.y > b.value.y) {
+						return -1;
+					}
+					return 0;
+				})
+
+				// draw y ticks
+				loupe(div)
+					.line({
+						x1: 73,
+						y1: 50,
+						x2: 78,
+						y2: 50,
+						stroke: 1,
+						strokeColor: 'black'
+					})
+					.data(data)
+					.transform('linear', {
+						y1: function(val, d, index) {
+							var maxDate = data[data.length-1].value.y.getTime(),
+								firstDate = data[0].value.y.getTime(),
+								thisDate = d.value.y.getTime();
+
+							return (maxDate - thisDate) / (maxDate - firstDate) * 240
+						},
+						y2: function(val, d, index) {
+							var maxDate = data[data.length-1].value.y.getTime(),
+								firstDate = data[0].value.y.getTime(),
+								thisDate = d.value.y.getTime();
+
+							return (maxDate - thisDate) / (maxDate - firstDate) * 240
+						}
+					})
+					.draw();
+
+				data.sort(function(a, b) {
+					if (a.value.x < b.value.x) {
+						return -1;
+					}
+					else if (a.value.x > b.value.x) {
+						return 1;
+					}
+					return 0;
+				});
+
+				// draw labels
+				for (var i=0; i<data.length; i++) {
+					loupe(div)
+						.text({
+							class: 'label',
+							position: (data[i].value.x * 40) + 78 + ', 255',
+							content: (data[i].value.x) + 'lbs'
+						})
+						.draw();
+				}
+
+				data.sort(function(a, b) {
+					if (a.value.y < b.value.y) {
+						return -1;
+					}
+					else if (a.value.y > b.value.y) {
+						return 1;
+					}
+					return 0;
+				})
+
+				for (var i=0; i<data.length; i++) {
+					var maxDate = data[data.length-1].value.y.getTime(),
+						firstDate = data[0].value.y.getTime(),
+						thisDate = data[i].value.y.getTime();
+
+					loupe(div)
+						.text({
+							class: 'label',
+							position: '35, ' + ((maxDate - thisDate) / (maxDate - firstDate) * 240),
+							content: (data[i].value.y.getHours() - 12) + ':00PM'
+						})
+						.draw();
+				}
+
+				console.dir(data);
+			}
+		</script>
+
+		<style type="text/css">
+			body {
+				font-family: "Helvetica Neue", Helvetica, sans-serif;
+				padding-left: 70px;
+			}
+
+			h1 {
+				font-size: 65px;
+			}
+			h4 {
+				margin: 5px;
+			}
+
+			.container {
+				width: 750px;
+				height: 300px;
+				border: 1px solid #ccc;
+			}
+	
+			.label {
+				font-size: 10px;
+			}
+
+			#infoPanel {
+				width: 100px;
+				height: 100px;
+				border: 1px solid #000;
+				background: #fff;
+				position: fixed;
+				text-align: center;
+				left: 477px;
+				top: 166px;
+			}
+		</style>
+	</head>
+	<body>	
+		<h1>Area Chart</h1>
+		<div class="container"></div>
+	</body>
+</html>

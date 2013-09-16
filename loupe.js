@@ -280,8 +280,8 @@ function loupe_d_math (d, dx, op) {
 
 	if (d) {
 		var args = d.split(/[a-zA-Z]+/g),
-			operations = d.split(/[0-9,.\-]+/g),
-			tmpOperations = d.split(/[0-9,.\-]+/g);
+			operations = d.split(/[0-9, .\-]+/g),
+			tmpOperations = d.split(/[0-9, .\-]+/g);
 
 		args.shift();
 		args.pop();
@@ -289,7 +289,7 @@ function loupe_d_math (d, dx, op) {
 		if (!isNaN(dx)) {
 
 			for(var i=0, len=args.length; i<len; i++) {
-				var tmp = args[i].split(','),
+				var tmp = args[i].split(/,|\s/g),
 					operator = tmpOperations.shift().toUpperCase();
 				
 				for(var j=0; j<tmp.length; j++) {
@@ -306,7 +306,6 @@ function loupe_d_math (d, dx, op) {
 						tmp[j] = tmp[j] / dx;
 					}
 					
-
 					if (operator == 'A' && (j == 3 || j == 4)) {
 						tmp[j] = tmp[j] >= 0.5 ? 1 : 0;
 					}
@@ -314,9 +313,12 @@ function loupe_d_math (d, dx, op) {
 				args[i] = tmp.join(',');
 			}
 		}
+		else if (dx.x && dx.y) {
+
+		}
 		else {
 			var argsDx = dx.split(/[a-zA-Z]+/g),
-				operationsDx = dx.split(/[0-9,.\-]+/g);
+				operationsDx = dx.split(/[0-9, .\-]+/g);
 
 			argsDx.shift();
 			argsDx.pop();
@@ -326,8 +328,8 @@ function loupe_d_math (d, dx, op) {
 			}
 
 			for(var i=0, len=args.length; i<len; i++) {
-				var tmp = args[i].split(','),
-					tmpDx = argsDx[i].split(','),
+				var tmp = args[i].split(/,|\s/g),
+					tmpDx = argsDx[i].split(/,|\s/g),
 					operator = tmpOperations.shift().toUpperCase();
 
 				if (tmp.length != tmpDx.length) {
@@ -364,6 +366,24 @@ function loupe_d_math (d, dx, op) {
 	}
 
 	return d;
+}
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.d = {
+	
+	add: loupe_d_add,
+
+	sub: loupe_d_sub,
+
+	mult: loupe_d_mult,
+
+	divide: loupe_d_divide,
+
+	compare: loupe_d_compare
 }
 // Source: src/math/color.js
 function loupe_color_add (d, dx) {
@@ -479,6 +499,24 @@ function loupe_hex_to_rgb_values (hex) {
 
 	return [r,g,b];
 }
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.color = {
+	
+	add: loupe_color_add,
+
+	sub: loupe_color_sub,
+
+	mult: loupe_color_mult,
+
+	divide: loupe_color_divide,
+
+	compare: loupe_color_compare
+}
 // Source: src/math/transform.js
 function loupe_transform_add (d, dx) {
 
@@ -551,6 +589,24 @@ function loupe_transform_math(d, dx, op) {
 
 	return type + '(' + body.join(',') + ')';
 }
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.transform = {
+	
+	add: loupe_transform_add,
+
+	sub: loupe_transform_sub,
+
+	mult: loupe_transform_mult,
+
+	divide: loupe_transform_divide,
+
+	compare: loupe_transform_compare
+}
 // Source: src/math/numeric.js
 function loupe_numeric_add (a, b) {
 	return (a * 1) + (b * 1);
@@ -577,6 +633,24 @@ function loupe_numeric_compare (a, b) {
 		return -1;
 	}
 	return 0;
+}
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.numeric = {
+	
+	add: loupe_numeric_add,
+
+	sub: loupe_numeric_sub,
+
+	mult: loupe_numeric_mult,
+
+	divide: loupe_numeric_divide,
+
+	compare: loupe_numeric_compare
 }
 // Source: src/animation/timer.js
 function loupe_start_task (fn, args, scope, interval) {
@@ -713,21 +787,24 @@ function loupe_style (el, prop, val) {
 	}
 }
 // Source: src/data/analyze_linear.js
-function loupe_analyze_linear_data (data) {
+function loupe_analyze_linear_data (self, data) {
 
 	data.metrics = {};
 	data.metrics.sum = 0;
 
 	loupe_each(data, function(val, key) {
-		if (key != 'metrics') {
-			var readVal = val;
-			data.metrics.sum += readVal;
-			data.metrics.max = data.metrics.max > readVal ? data.metrics.max : readVal;
-			data.metrics.min = data.metrics.min < readVal ? data.metrics.min : readVal;
+		if (!isNaN(key)) {
+			if (!isNaN(val)) {
+				data.metrics.sum += val;
+			}
+			data.metrics.max = data.metrics.max > val ? data.metrics.max : val;
+			data.metrics.min = data.metrics.min < val ? data.metrics.min : val;
 		}
 	});
 
-	data.metrics.avg = data.metrics.sum / data.length;
+	if (data.metrics.sum) {
+		data.metrics.avg = data.metrics.sum / data.length;
+	}
 
 	return data;
 }
@@ -746,7 +823,16 @@ loupe_cls(loupe, {
 
 		if (!opts.type || opts.type == 'linear') {
 			loupe_each(datapoints, function(data) {
-				datacopy.push(reader(data).value);
+				var val = reader(data).value;
+				if (opts.transformer) {
+					loupe_each(val, function(v, key) {
+						if (opts.transformer[key]) {
+							val[key] = opts.transformer[key](v);
+						}
+					});
+				}
+
+				datacopy.push(val);
 			});
 			
 			if (opts.replace) {
@@ -756,8 +842,9 @@ loupe_cls(loupe, {
 				self.data_points = self.data_points.concat(datacopy);
 			}
 
-			self.analyzed_data = loupe_analyze_linear_data(self.data_points);
+			self.analyzed_data = opts.analyzer ? opts.analyzer(self, self.data_points) : loupe_analyze_linear_data(self, self.data_points);
 			self.analyzed_data.type = opts.type || 'linear';
+			self.analyzed_data.opts = opts;
 		}
 
 		return self;
@@ -774,7 +861,7 @@ function loupe_linear_sync (self) {
 			loupe_each(self.shapes, function(shape, shapeKey) {
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
-					if (dKey != 'metrics' && dKey != 'type') {
+					if (!isNaN(dKey)) {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
 							if (typeof val == 'object') {
@@ -842,7 +929,7 @@ loupe_extend(loupe, {
 	syncData: loupe_sync_data
 })
 // Source: src/transformations/linear.js
-function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, engine, index) {
+function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, opts, engine, index) {
 
 	var map;
 
@@ -854,10 +941,10 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 	});
 
 	if (loupe_is_function(opts)) {
-		loupe_extend(shape, opts(shape, prevShape, data, analyzed_data, index), true);
+		loupe_extend(shape, opts(self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else if (loupe[shape._tag + 'Transform']) {
-		loupe_extend(shape, loupe[shape._tag + 'Transform'](shape, prevShape, data, analyzed_data, index), true);
+		loupe_extend(shape, loupe[shape._tag + 'Transform'](self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else { 
 		loupe_each(opts, function(val, key) {
@@ -889,6 +976,7 @@ loupe_cls(loupe, {
 					switch (mode) {
 						case 'linear': {
 							loupe_linear_transform(
+								self,
 								shape, 
 								prevShape[shape._tag || shape.tag], 
 								self.analyzed_data[index], 
@@ -933,6 +1021,7 @@ var loupe_shape_svg_map = {
 	stroke: 'stroke-width',
 	strokeColor: 'stroke',
 	color: 'fill',
+	fill: 'fill',
 	transform: 'transform',
 	class: 'class',
 	style: 'style'
@@ -1059,6 +1148,9 @@ loupe_cls(loupe, {
 var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
 	centerY: 'cy',
+	cx: 'cx',
+	cy: 'cy',
+	r: 'r',
 	radius: 'r'
 }, loupe_shape_svg_map);
 
@@ -1277,6 +1369,9 @@ loupe_cls(loupe, {
 
 			loupe_each(shape_queue, function (shapes) {
 				loupe_each(shapes, function(shape) {
+					if (shape.ignore) {
+						return true;
+					}
 
 					if (animate || self.animate_on || shape.other.animate) {
 

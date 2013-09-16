@@ -12,7 +12,16 @@ loupe_cls(loupe, {
 
 		if (!opts.type || opts.type == 'linear') {
 			loupe_each(datapoints, function(data) {
-				datacopy.push(reader(data).value);
+				var val = reader(data).value;
+				if (opts.transformer) {
+					loupe_each(val, function(v, key) {
+						if (opts.transformer[key]) {
+							val[key] = opts.transformer[key](v);
+						}
+					});
+				}
+
+				datacopy.push(val);
 			});
 			
 			if (opts.replace) {
@@ -22,8 +31,9 @@ loupe_cls(loupe, {
 				self.data_points = self.data_points.concat(datacopy);
 			}
 
-			self.analyzed_data = loupe_analyze_linear_data(self.data_points);
+			self.analyzed_data = opts.analyzer ? opts.analyzer(self, self.data_points) : loupe_analyze_linear_data(self, self.data_points);
 			self.analyzed_data.type = opts.type || 'linear';
+			self.analyzed_data.opts = opts;
 		}
 
 		return self;

@@ -1,18 +1,21 @@
-function loupe_analyze_linear_data (data) {
+function loupe_analyze_linear_data (self, data) {
 
 	data.metrics = {};
 	data.metrics.sum = 0;
 
 	loupe_each(data, function(val, key) {
-		if (key != 'metrics') {
-			var readVal = val;
-			data.metrics.sum += readVal;
-			data.metrics.max = data.metrics.max > readVal ? data.metrics.max : readVal;
-			data.metrics.min = data.metrics.min < readVal ? data.metrics.min : readVal;
+		if (!isNaN(key)) {
+			if (!isNaN(val)) {
+				data.metrics.sum += val;
+			}
+			data.metrics.max = data.metrics.max > val ? data.metrics.max : val;
+			data.metrics.min = data.metrics.min < val ? data.metrics.min : val;
 		}
 	});
 
-	data.metrics.avg = data.metrics.sum / data.length;
+	if (data.metrics.sum) {
+		data.metrics.avg = data.metrics.sum / data.length;
+	}
 
 	return data;
 }

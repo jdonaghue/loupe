@@ -24,3 +24,21 @@ function loupe_numeric_compare (a, b) {
 	}
 	return 0;
 }
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.numeric = {
+	
+	add: loupe_numeric_add,
+
+	sub: loupe_numeric_sub,
+
+	mult: loupe_numeric_mult,
+
+	divide: loupe_numeric_divide,
+
+	compare: loupe_numeric_compare
+}

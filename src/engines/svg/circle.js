@@ -1,6 +1,9 @@
 var loupe_circle_svg_map = loupe_extend({
 	centerX: 'cx',
 	centerY: 'cy',
+	cx: 'cx',
+	cy: 'cy',
+	r: 'r',
 	radius: 'r'
 }, loupe_shape_svg_map);
 

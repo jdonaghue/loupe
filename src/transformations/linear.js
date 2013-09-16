@@ -1,4 +1,4 @@
-function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, engine, index) {
+function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, opts, engine, index) {
 
 	var map;
 
@@ -10,10 +10,10 @@ function loupe_linear_transform (shape, prevShape, data, analyzed_data, opts, en
 	});
 
 	if (loupe_is_function(opts)) {
-		loupe_extend(shape, opts(shape, prevShape, data, analyzed_data, index), true);
+		loupe_extend(shape, opts(self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else if (loupe[shape._tag + 'Transform']) {
-		loupe_extend(shape, loupe[shape._tag + 'Transform'](shape, prevShape, data, analyzed_data, index), true);
+		loupe_extend(shape, loupe[shape._tag + 'Transform'](self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else { 
 		loupe_each(opts, function(val, key) {

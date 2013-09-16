@@ -1,4 +1,4 @@
-function pieTransform (shape, prevShape, data, analyzed_data, index) {
+function pieTransform (self, shape, prevShape, data, analyzed_data, index) {
 
 	var pi = Math.PI,
 		rad = pi / 180,

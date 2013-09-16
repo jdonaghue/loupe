@@ -69,3 +69,21 @@ function loupe_transform_math(d, dx, op) {
 
 	return type + '(' + body.join(',') + ')';
 }
+
+loupe_extend(loupe, {
+
+	math: loupe.math || {}
+});
+
+loupe.math.transform = {
+	
+	add: loupe_transform_add,
+
+	sub: loupe_transform_sub,
+
+	mult: loupe_transform_mult,
+
+	divide: loupe_transform_divide,
+
+	compare: loupe_transform_compare
+}

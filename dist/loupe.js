@@ -823,10 +823,10 @@ loupe_cls(loupe, {
 		if (!opts.type || opts.type == 'linear') {
 			loupe_each(datapoints, function(data) {
 				var val = reader(data).value;
-				if (opts.transformer) {
+				if (opts.interpolate) {
 					loupe_each(val, function(v, key) {
-						if (opts.transformer[key]) {
-							val[key] = opts.transformer[key](v);
+						if (opts.interpolate[key]) {
+							val[key] = opts.interpolate[key](v);
 						}
 					});
 				}

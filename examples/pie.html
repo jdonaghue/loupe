@@ -43,9 +43,11 @@
 								alert(shape._tag + data.value);
 							},
 							mouseover: function(e, shape, data) {
-								var d = peppy.query('#infoPanel')[0];
+								var d = peppy.query('#infoPanel')[0],
+									dIsNew = false;
 
 								if (!d) {
+									dIsNew = true;
 									d = document.createElement('div');
 									d.id = 'infoPanel';
 								}
@@ -60,7 +62,10 @@
 									'<br/><br/>',
 									data.value
 								].join('');
-								div[0].appendChild(d);
+
+								if (dIsNew) {
+									div[0].appendChild(d);
+								}
 							},
 							mouseout: function(e, shape, data) {
 

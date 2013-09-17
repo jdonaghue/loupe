@@ -24,7 +24,7 @@
 					dataOpts = { 
 						reader: function(a) { return a }, 
 						replace: true, 
-						transformer: { 
+						interpolate: { 
 							
 							y: function(val) {
 								var parts = val.split(' ');
@@ -125,7 +125,53 @@
 				loupe(div)
 					.area({
 						d: 'M 78 240 L 78 240 Z',
-						color: '#b0c4de'
+						color: '#b0c4de',
+						events: {
+							mousemove: function(e, shape, data) {
+								var offsetX = e.offsetX,
+									x = Math.round((offsetX - 85) / 40);
+
+								if (shape.lookup[x]) {
+									var val = shape.lookup[x].value.y,
+										hours = val.getHours(),
+										mins = val.getMinutes();
+
+									if (hours > 12) {
+										hours-=12;
+									}
+
+									var d = peppy.query('#infoPanel')[0],
+										dIsNew = false;
+
+									if (!d) {
+										dIsNew = true;
+										d = document.createElement('div');
+										d.id = 'infoPanel';
+									}
+
+									d.innerHTML = [
+										'<h4>',
+											'Time: ',
+											hours + ':' + mins,
+										'</h4>',
+										'<small>',
+											'Weight: ',
+											shape.lookup[x].value.x + 'lbs',
+										'</small>',
+										'<br/><br/>'
+									].join('');
+
+									if (dIsNew) {
+										div[0].appendChild(d);
+									}
+								}
+							},
+							mouseout: function(e, shape, data) {
+
+								var title = peppy.query('#infoPanel')[0];
+								title.parentNode.removeChild(title);
+							}
+						}
 					})
 					.data(data, dataOpts)
 					.transform('linear')
@@ -248,18 +294,23 @@
 						return 1;
 					}
 					return 0;
-				})
+				});
 
 				for (var i=0; i<data.length; i++) {
 					var maxDate = data[data.length-1].value.y.getTime(),
 						firstDate = data[0].value.y.getTime(),
-						thisDate = data[i].value.y.getTime();
+						thisDate = data[i].value.y.getTime(),
+						hours = data[i].value.y.getHours();
+
+					if (hours > 12) {
+						hours-=12;
+					}
 
 					loupe(div)
 						.text({
 							class: 'label',
 							position: '35, ' + ((maxDate - thisDate) / (maxDate - firstDate) * 240),
-							content: (data[i].value.y.getHours() - 12) + ':00PM'
+							content: hours + ':' + data[i].value.y.getMinutes() + 'PM'
 						})
 						.draw();
 				}
@@ -293,12 +344,12 @@
 
 			#infoPanel {
 				width: 100px;
-				height: 100px;
+				height: 50px;
 				border: 1px solid #000;
 				background: #fff;
 				position: fixed;
 				text-align: center;
-				left: 477px;
+				left: 728px;
 				top: 166px;
 			}
 		</style>

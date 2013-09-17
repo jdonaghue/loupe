@@ -39,6 +39,9 @@ function areaTransform (self, shape, prevShape, data, analyzed_data, index) {
 	shape.d.push(data.x);
 	shape.d.push(data.y);
 
+	shape.lookup = shape.lookup || {};
+	shape.lookup[self.original_data[index].value.x] = self.original_data[index];
+
 	shape.d.push(data.x);
 	shape.d.push(shape.d[2]);
 

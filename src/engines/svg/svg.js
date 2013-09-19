@@ -18,6 +18,9 @@ function loupe_get_map (type) {
 		case 'polyline': {
 			return loupe_polyline_svg_map;
 		}
+		case 'text': {
+			return loupe_text_svg_map;
+		}
 	}
 }
 
@@ -45,8 +48,8 @@ loupe_cls(loupe, {
 
 			if (self.width || self.height) {
 				loupe_style(el, { 
-					width: self.width,
-					height: self.height
+					width: self.width || 'auto',
+					height: self.height || 'auto'
 				});
 			}
 
@@ -62,6 +65,7 @@ loupe_cls(loupe, {
 
 			loupe_each(shape_queue, function (shapes) {
 				loupe_each(shapes, function(shape) {
+					
 					if (shape.ignore) {
 						return true;
 					}
@@ -104,7 +108,7 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handlers, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { 
 								loupe_each(handlers, function(h) {
-									return h(e, shape, self.original_data[shape.dataIndex]); 
+									return h(e, shape, shape.originalData); 
 								});
 							});
 						});
@@ -141,7 +145,7 @@ loupe_cls(loupe, {
  							}
 						});
 
-						var shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.other ? shape.other.content : null);
+						var shapeEl = loupe_createEl(loupe_svg_ns, shape, shape.content);
 						svg.appendChild(shapeEl);
 
 						shape._el = shapeEl;
@@ -149,7 +153,7 @@ loupe_cls(loupe, {
 						loupe_each(shape.other.events, function(handlers, eventType) {
 							loupe_event_bind(shapeEl, eventType, function(e) { 
 								loupe_each(handlers, function(h) {
-									return h(e, shape, self.original_data[shape.dataIndex]); 
+									return h(e, shape, shape.originalData); 
 								});
 							});
 						});

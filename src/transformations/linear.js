@@ -16,14 +16,26 @@ function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, op
 		loupe_extend(shape, loupe[shape._tag + 'Transform'](self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else { 
-		loupe_each(opts, function(val, key) {
+		loupe_each(opts, function(fn, key) {
 			map = loupe_get_map(shape.tag);
 
-			if (loupe_is_function(val)) {
-				shape[map[key]] = val(shape[map[key]], data, index, shape);
+			var shapeVal,
+				property;
+
+			if (typeof map[key] == 'object') {
+				property = map[key].property;
+				shape[property] = map[key].value(fn, shape[property], data, analyzed_data, index, shape);
 			}
 			else {
-				shape[map[key]] = loupe_get_mult(map[key])(shape[map[key]], data); 
+				property = map[key];
+				shapeVal = shape[property];
+
+				if (fn) {
+					shape[property] = fn(shapeVal, data, analyzed_data, index, shape);
+				}
+				else {
+					shape[property] = loupe_get_mult(property)(shapeVal, data); 
+				}
 			}
 		});
 	}

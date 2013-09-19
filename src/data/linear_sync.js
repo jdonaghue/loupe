@@ -4,10 +4,13 @@ function loupe_linear_sync (self) {
 
 	if (self.analyzed_data.length > 0) {
 		loupe_each(self.dom, function(d, domKey) {
+			
 			var data_queue = [];
 			loupe_each(self.shapes, function(shape, shapeKey) {
+			
 				var shape_queue = [];
 				loupe_each(self.analyzed_data, function(d, dKey) {
+			
 					if (!isNaN(dKey)) {
 						var clone = {};
 						loupe_each(shape, function(val, key) {
@@ -19,9 +22,12 @@ function loupe_linear_sync (self) {
 							}
 						});
 						clone.data = d;
-						clone.dataIndex = dKey;
+						clone.dataIndex = d.index || dKey;
+						clone.originalData = self.original_data[clone.dataIndex];
 
-						var existing = self.queue[domKey] ? self.queue[domKey][shapeKey] ? self.queue[domKey][shapeKey][dKey] : null : null;
+						var existing = self.queue[domKey] ? 
+							self.queue[domKey][shapeKey] ? 
+								self.queue[domKey][shapeKey][dKey] : null : null;
 
 						if (existing && self.queue[domKey][shapeKey].length == self.analyzed_data.length) {
 							clone._el = existing._el;
@@ -40,11 +46,14 @@ function loupe_linear_sync (self) {
 	}
 	else {
 		loupe_each(self.dom, function(d) {
+			
 			var data_queue = [];
 			var shape_queue = [];
 			loupe_each(self.shapes, function(shape) {
+			
 				var clone = {};
 				loupe_each(shape, function(val, key) {
+			
 					if (typeof val == 'object') {
 						clone[key] = loupe_extend(loupe_is_array(val) ? [] : {}, val);
 					}

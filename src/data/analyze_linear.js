@@ -8,6 +8,9 @@ function loupe_analyze_linear_data (self, data) {
 			if (!isNaN(val)) {
 				data.metrics.sum += val;
 			}
+			else {
+				val.index = key;
+			}
 			data.metrics.max = data.metrics.max > val ? data.metrics.max : val;
 			data.metrics.min = data.metrics.min < val ? data.metrics.min : val;
 		}

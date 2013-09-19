@@ -6,7 +6,19 @@ var loupe_text_svg_map = loupe_extend({
 	textAnchor: 'text-anchor',
 	rotate: 'rotate',
 	textLength: 'textLength',
-	lengthAdjust: 'lengthAdjust'
+	lengthAdjust: 'lengthAdjust',
+	content: 'content',
+	position: {
+		property: 'transform',
+		value: function(fn, shapeVal, data, analyzed_data, index, shape) {
+			if (fn) {
+				return 'translate(' + fn(shapeVal, data, analyzed_data, index, shape) + ')';
+			}
+			else {
+				return 'translate(' + shapeVal + ')';
+			}
+		}
+	}
 }, loupe_shape_svg_map);
 
 loupe_extend(loupe, {

@@ -20,11 +20,11 @@ loupe.extend(loupe, {
 
 		for (var prop in props) {
 			var mapped_prop = map[prop];
-			if (mapped_prop) {
-				shape[mapped_prop] = props[prop];
-			}
-			else if (special && prop in special) {
+			if (special && prop in special) {
 				special[prop](shape, props[prop]);
+			}
+			else if (mapped_prop) {
+				shape[mapped_prop] = props[prop];
 			}
 			else if (prop == 'from') {
 				shape.from = loupe.override({}, props[prop]);

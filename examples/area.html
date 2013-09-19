@@ -28,9 +28,9 @@
 							
 							y: function(val) {
 								var parts = val.split(' ');
-									dateParts = parts[0].split('-'),
-									timeParts = parts[1].split(':');
-								return new Date(dateParts[0], dateParts[1], dateParts[2], timeParts[0], timeParts[1], timeParts[2]);
+									d = parts[0].split('-'),
+									t = parts[1].split(':');
+								return new Date(d[0], d[1], d[2], t[0], t[1], t[2]);
 							}
 						},
 						analyzer: function(self, data) {
@@ -103,7 +103,8 @@
 								
 								analyzed.push({
 									x: analyzedX[i].x,
-									y: analyzedY[i].y
+									y: analyzedY[i].y,
+									index: i
 								});
 							}
 
@@ -217,10 +218,10 @@
 					})
 					.data(data)
 					.transform('linear', {
-						x1: function(val, data, index) {
+						x1: function(val, data, analyzed_data, index) {
 							return (data.value.x * 40) + 85;
 						},
-						x2: function(val, data, index) {
+						x2: function(val, data, analyzed_data, index) {
 							return (data.value.x * 40) + 85	;
 						}
 					})
@@ -234,7 +235,7 @@
 						return -1;
 					}
 					return 0;
-				})
+				});
 
 				// draw y ticks
 				loupe(div)
@@ -248,14 +249,14 @@
 					})
 					.data(data)
 					.transform('linear', {
-						y1: function(val, d, index) {
+						y1: function(val, d, analyzed_data, index) {
 							var maxDate = data[data.length-1].value.y.getTime(),
 								firstDate = data[0].value.y.getTime(),
 								thisDate = d.value.y.getTime();
 
 							return (maxDate - thisDate) / (maxDate - firstDate) * 240
 						},
-						y2: function(val, d, index) {
+						y2: function(val, d, analyzed_data, index) {
 							var maxDate = data[data.length-1].value.y.getTime(),
 								firstDate = data[0].value.y.getTime(),
 								thisDate = d.value.y.getTime();

@@ -42,7 +42,7 @@
 					greybars
 						.data(data, opts)
 						.transform('linear', {
-							y: function(val, data, index) { return 20 + (index * 40); }
+							y: function(val, data, analyzedData, index) { return 20 + (index * 40); }
 						})
 						.draw({ animate_duration: 500 });
 
@@ -59,7 +59,7 @@
 					middlegrey
 						.data(data, opts)
 						.transform('linear', {
-							y: function(val, data, index) { return 20 + (index * 40); },
+							y: function(val, data, analyzedData, index) { return 20 + (index * 40); },
 							width: null
 						})
 						.draw({ animate_duration: 500 });
@@ -77,7 +77,7 @@
 					darkgrey
 						.data(data, opts)
 						.transform('linear', {
-							y: function(val, data, index) { return 20 + (index * 40); },
+							y: function(val, data, analyzedData, index) { return 20 + (index * 40); },
 							width: null
 						})
 						.draw({ animate_duration: 500 });
@@ -95,7 +95,7 @@
 					lightbluebars
 						.data(data, opts)
 						.transform('linear', {
-							y: function(val, data, index) { return 27 + (index * 40); }, 
+							y: function(val, data, analyzedData, index) { return 27 + (index * 40); }, 
 							width: null
 						})
 						.draw({ animate_duration: 500 });
@@ -113,7 +113,7 @@
 					bluebars
 						.data(data, opts)
 						.transform('linear', {
-							y: function(val, data, index) { return 27 + (index * 40); }, 
+							y: function(val, data, analyzedData, index) { return 27 + (index * 40); }, 
 							width: null
 						})
 						.draw({ animate_duration: 500 });

@@ -1,8 +1,10 @@
 function pieTransform (self, shape, prevShape, data, analyzed_data, index) {
 
+	shape.from = shape.from || {};
+
 	var pi = Math.PI,
 		rad = pi / 180,
-		r = shape.r,
+		r = shape.from.r != undefined ? shape.from.r : shape.r,
 		cx = shape.cx,
 		cy = shape.cy,
 		angleStart = prevShape && prevShape.angleEnd ? prevShape.angleEnd : 0,
@@ -15,7 +17,8 @@ function pieTransform (self, shape, prevShape, data, analyzed_data, index) {
 	shape.angleStart = angleStart;
 	shape.angleEnd = angleEnd;
 	shape.d = ['M' + cx, cy + 'L' + x1, y1 + 'A' + r, r, 0, +(angleEnd - angleStart > 180), 0, x2, y2 + 'z'].join(',');
-	shape.from.d = shape.from.d.split(',');
+	
+	shape.from.d = (shape.from.d || shape.d).split(',');
 	shape.from.d[5] = +(angleEnd - angleStart > 180);
 	shape.from.d = shape.from.d.join(',');
 

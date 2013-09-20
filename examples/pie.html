@@ -27,9 +27,6 @@
 
 				loupe(div)
 					.pie({
-						from: {
-							d: 'M250,250L200,200A0,0,0,0,0,10,10z'
-						},
 						centerX: 250,
 						centerY: 250,
 						radius: 200,
@@ -76,7 +73,32 @@
 					})
 					.data(data, opts)
 					.transform('linear')
-					.draw({ animate_duration: 500 });
+					.draw({ 
+						animate_duration: 500,
+						from: {
+							r: 1,
+							angleStart: 1,
+							angleEnd: 1
+						},
+						changeHook: function(el, prop, newVal, delta) {
+
+							if (prop == 'r' || prop == 'angleStart' || prop == 'angleEnd') {
+								var pi = Math.PI,
+									rad = pi / 180,
+									r = prop == 'r' ? newVal : el.getAttribute('r') * 1,
+									cx = el.getAttribute('cx') * 1,
+									cy = el.getAttribute('cy') * 1,
+									angleStart = prop == 'angleStart' ? newVal : el.getAttribute('angleStart') * 1,
+									angleEnd =  prop == 'angleEnd' ? newVal : el.getAttribute('angleEnd') * 1,
+									x1 = cx + r * Math.cos(-angleStart * rad),
+									x2 = cx + r * Math.cos(-angleEnd * rad),
+									y1 = cy + r * Math.sin(-angleStart * rad),
+									y2 = cy + r * Math.sin(-angleEnd * rad);
+
+								el.setAttribute('d', ['M' + cx, cy + 'L' + x1, y1 + 'A' + r, r, 0, +(angleEnd - angleStart > 180), 0, x2, y2 + 'z'].join(','));
+							}
+						}
+					});
 			}
 		</script>
 

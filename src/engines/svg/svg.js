@@ -70,7 +70,7 @@ loupe_cls(loupe, {
 						return true;
 					}
 
-					if (animate || self.animate_on || shape.other.animate) {
+					if (animate || shape.other.animate) {
 
 						var shapeEl,
 							animateConfig = animate || (shape.other ? (shape.other.animate || self) : self),
@@ -87,15 +87,15 @@ loupe_cls(loupe, {
 						else {
 							from = loupe_extend({}, shape.from);
 
-							loupe_each(from, function(fromProp, fromKey) {
-								if (loupe_is_array(fromProp)) {
-									from[fromKey] = fromProp[shape.dataIndex] || loupe_property_default[fromKey];
+							loupe_each(from, function(propVal, propKey) {
+								if (loupe_is_array(propVal)) {
+									from[propKey] = propVal[shape.dataIndex] || loupe_property_default[propKey];
 								}
 							});
 
-							loupe_each(shape, function(shapeProp, shapeKey) {
-								if (!from[shapeKey]) {
-									from[shapeKey] = loupe_property_default[shapeKey] || shapeProp;
+							loupe_each(shape, function(propVal, propKey) {
+								if (!from[propKey]) {
+									from[propKey] = animateConfig.from && animateConfig.from[propKey] != undefined ? animateConfig.from[propKey] : propVal || loupe_property_default[propKey];
 								}
 							});
 
@@ -116,11 +116,12 @@ loupe_cls(loupe, {
 						shape.currentAnimation = shape.currentAnimation || {};
 						
 						loupe_each(shape, function(val, prop) {
-							if (prop in {cx: null, cy: null, r: null, d: null, fill: null, x:null, y:null, width: null, height: null, x1: null, x2: null, y1: null, y2: null}) {
+							
+							if ((animateConfig.from && prop in animateConfig.from) || (!animateConfig.from && prop in {cx:0, cy:0, r:0, d:0, fill:0, x:0, y:0, width:0, height:0, x1:0, x2:0, y1:0, y2:0})) {
 								var start, stop;
 
-								if (from[prop]) {
-									start = from[prop] || shape[prop];
+								if (from[prop] != undefined) {
+									start = from[prop];
 								}
 								else {
 									start = loupe_is_array(shape[prop]) ? shape[prop][shape.dataIndex] || shape[prop] : shape[prop];	
@@ -133,7 +134,8 @@ loupe_cls(loupe, {
 									start: start || loupe_property_default[prop] || 0,
 									stop: stop || loupe_property_default[prop] || 0,
 									duration: animateConfig.animate_duration || 400,
-									animate_method: animateConfig.animate_method
+									animate_method: animateConfig.animate_method,
+									changeHook: animateConfig.changeHook
 								});
 							}
 						});
@@ -157,8 +159,6 @@ loupe_cls(loupe, {
 								});
 							});
 						});
-
-						self.queue = [];
 					}
 				});
 			});

@@ -8,6 +8,10 @@
 			window.onload = function() {
 
 				var barChartBlue,
+					xTicks,
+					yTicks,
+					xLabels,
+					yLabels = [],
 					uniqueX = {},
 					uniqueY = {};
 
@@ -194,7 +198,9 @@
 								mouseout: function(e, shape, data) {
 
 									var title = peppy.query('#infoPanel')[0];
-									title.parentNode.removeChild(title);
+									if (title) {
+										title.parentNode.removeChild(title);
+									}
 								}
 							}
 						});
@@ -212,10 +218,16 @@
 								return 240 - shape.y;
 							}
 						})
-						.draw();
+						.draw({
+							from: {
+								y: 240,
+								x: null,
+								height: 0
+							}
+						});
 
 					// draw y ticks
-					loupe(div)
+					yTicks = yTicks || loupe(div)
 						.line({
 							x1: 73,
 							y1: 50,
@@ -223,7 +235,10 @@
 							y2: 50,
 							stroke: 1,
 							strokeColor: 'black'
-						})
+						});
+
+					yTicks
+						.clear()
 						.data(data, opts)
 						.transform('linear', {
 							y1: function(val, d, analyzed_data, index) {
@@ -236,7 +251,7 @@
 						.draw();
 
 					// draw x ticks
-					loupe(div)
+					xTicks = xTicks || loupe(div)
 						.line({
 							x1: 73,
 							y1: 240,
@@ -244,7 +259,10 @@
 							y2: 245,
 							stroke: 1,
 							strokeColor: 'black'
-						})
+						});
+
+					xTicks
+						.clear()
 						.data(data, opts)
 						.transform('linear', {
 							x1: function(val, d, analyzed_data, index) {
@@ -266,12 +284,15 @@
 						return 0;
 					});
 
-					loupe(div)
+					xLabels = xLabels || loupe(div)
 						.text({
 							class: 'label',
 							content: '',
 							position: ''
-						})
+						});
+
+					xLabels
+						.clear()
 						.data(data, opts)
 						.transform('linear', {
 							position: function(val, d, analyzed_data, index) {
@@ -303,13 +324,18 @@
 							hours-=12;
 						}
 
-						loupe(div)
-							.text({
-								class: 'label',
-								position: '30, ' + ((maxDate - thisDate) / (maxDate - firstDate) * 230),
-								content: hours + ':' + data[i].value.y.getMinutes() + 'PM'
-							})
-							.draw();
+						if (yLabels[i]) {
+							yLabels[i].clear();
+						}
+
+						yLabels.splice(i, 1, 
+							loupe(div)
+								.text({
+									class: 'label',
+									position: '30, ' + ((maxDate - thisDate) / (maxDate - firstDate) * 230),
+									content: hours + ':' + data[i].value.y.getMinutes() + 'PM'
+								})
+								.draw());
 					}
 
 					if (first == true) {

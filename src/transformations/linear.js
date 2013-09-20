@@ -2,13 +2,6 @@ function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, op
 
 	var map;
 
-	shape.from = shape.from || {};
-	loupe_each(shape, function(val, key) {
-		if (key != 'other' && key != 'from') {
-			shape.from[key] = shape.from[key] || val;
-		}
-	});
-
 	if (loupe_is_function(opts)) {
 		loupe_extend(shape, opts(self, shape, prevShape, data, analyzed_data, index), true);
 	}

@@ -452,14 +452,14 @@ function loupe_color_math (d, dx, op) {
 	dx = loupe_normalize_color(dx);
 
 	if (op == 'add') {
-		d[0] = (d[0] * 1) + (dx[0] * 1);
-		d[1] = (d[1] * 1) + (dx[1] * 1);
-		d[2] = (d[2] * 1) + (dx[2] * 1);
+		d[0] = d[0] + dx[0];
+		d[1] = d[1] + dx[1];
+		d[2] = d[2] + dx[2];
 	}
 	else if (op == 'sub') {
-		d[0] = (d[0] * 1) - (dx[0] * 1);
-		d[1] = (d[1] * 1) - (dx[1] * 1);
-		d[2] = (d[2] * 1) - (dx[2] * 1);
+		d[0] = d[0] - dx[0];
+		d[1] = d[1] - dx[1];
+		d[2] = d[2] - dx[2];
 	}
 	else if (op == 'mult') {
 		d[0] = d[0] * dx[0];
@@ -489,13 +489,14 @@ function loupe_normalize_color (color) {
 		if (color.indexOf('rgb') == 0) {
 			color = color.substring(4, color.length - 1);
 			color = color.split(',');
+			color = [color[0] * 1, color[1] * 1, color[2] * 1];
 		}
 		else {
 			color = loupe_hex_to_rgb_values(color);
 		}
 	}
 	else {
-		color = [color, color, color];
+		color = [color * 1, color * 1, color * 1];
 	}
 
 	return color;
@@ -503,7 +504,7 @@ function loupe_normalize_color (color) {
 
 function loupe_hex_to_rgb_values (hex) {
 
-	var rgb = hex.match(/([a-zA-Z0-9]{1})/g);
+	var rgb = hex.match(/([a-fA-F0-9]{1})/g);
 
 	if (rgb.length == 3) {
 		rgb.splice(1, 0, rgb[0]); // FF0b

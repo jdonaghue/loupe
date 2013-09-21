@@ -5,7 +5,7 @@ loupe
 
 Loupe is small (12K minified, 4K compressed)  
 Loupe is powerful (data transformations, animations, complex visualizations, etc)  
-Loupe is extensible
+Loupe is extensible ([read more](http://spectaclelabs.io/blog/2013/09/20/introducing-loupe/))
 
 [![Bullet Chart](http://spectaclelabs.io/blog/wp-content/uploads/2013/09/Screen-Shot-2013-09-20-at-7.39.14-AM-300x134.png "Bullet Chart")](http://spectaclelabs.io/loupe/examples/bullet-chart.html)
 

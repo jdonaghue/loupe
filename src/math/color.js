@@ -25,15 +25,29 @@ function loupe_color_compare (a, b) {
 	a = loupe_normalize_color(a);
 	b = loupe_normalize_color(b);
 
-	if (a[0] > b[0] || a[1] > b[1] || a[2] > b[2]) {
+	if (a[0] > b[0]) {
 		return 1;
 	}
+	else if (a[0] < b[0]) {
+		return -1;
+	}
 	else {
-		if (a[0] < b[0] || a[1] < b[1] || a[2] < b[2]) {
+		if (a[1] > b[1]) {
+			return 1;
+		}
+		else if (a[1] < b[1]) {
 			return -1;
 		}
 		else {
-			return 0;
+			if (a[2] > b[2]) {
+				return 1;
+			}
+			else if (a[2] < b[2]) {
+				return -1;
+			}
+			else { 
+				return 0;
+			}
 		}
 	}
 }
@@ -106,9 +120,9 @@ function loupe_hex_to_rgb_values (hex) {
 		rgb.splice(4, 0, rgb[4]); // FF00bb
 	}
 
-	var r = (parseInt(rgb[0], 16) + 1) * (parseInt(rgb[1], 16) + 1),
-		g = (parseInt(rgb[2], 16) + 1) * (parseInt(rgb[3], 16) + 1),
-		b = (parseInt(rgb[4], 16) + 1) * (parseInt(rgb[5], 16) + 1);
+	var r = parseInt(rgb[0] + rgb[1], 16),
+		g = parseInt(rgb[2] + rgb[3], 16),
+		b = parseInt(rgb[4] + rgb[5], 16);
 
 	return [r,g,b];
 }

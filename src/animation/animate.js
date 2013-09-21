@@ -25,9 +25,12 @@ function loupe_animate (el, opts) {
 
 				elapsedTime+=1;
 				changeHook(el, prop, newVal, delta)
-				if (elapsedTime > opts.duration || (direction >= 0 ? compare(newVal, opts.stop) >= 0 : compare(newVal, opts.stop) < 0)) {
+				if (elapsedTime > opts.duration || (direction >= 0 ? compare(newVal, stop) >= 0 : compare(newVal, stop) < 0)) {
 					if (opts.start == stop) {
 						loupe_attr(el, prop, stop);	
+					}
+					else if (compare(newVal, stop) == 0) {
+						loupe_attr(el, prop, newVal);	
 					}
 					loupe_stop_task(id, opts.callback, opts.callback_args);
 				}

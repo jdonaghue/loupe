@@ -186,6 +186,7 @@ function loupe_get_add (type) {
 		case 'd': {
 			return loupe_d_add;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_add;	
 		} 
@@ -204,6 +205,7 @@ function loupe_get_sub (type) {
 		case 'd': {
 			return loupe_d_sub;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_sub;	
 		}
@@ -222,6 +224,7 @@ function loupe_get_mult (type) {
 		case 'd': {
 			return loupe_d_mult;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_mult;	
 		}
@@ -240,6 +243,7 @@ function loupe_get_divide (type) {
 		case 'd': {
 			return loupe_d_divide;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_divide;	
 		}
@@ -258,6 +262,7 @@ function loupe_get_compare (type) {
 		case 'd': {
 			return loupe_d_compare;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_compare;	
 		}
@@ -386,11 +391,7 @@ function loupe_d_math (d, dx, op) {
 	return d;
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.d = {
 	
 	add: loupe_d_add,
@@ -519,11 +520,9 @@ function loupe_hex_to_rgb_values (hex) {
 	return [r,g,b];
 }
 
-loupe_extend(loupe, {
 
-	math: loupe.math || {}
-});
 
+loupe.math = loupe.math || {};
 loupe.math.color = {
 	
 	add: loupe_color_add,
@@ -609,11 +608,7 @@ function loupe_transform_math(d, dx, op) {
 	return type + '(' + body.join(',') + ')';
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.transform = {
 	
 	add: loupe_transform_add,
@@ -654,11 +649,7 @@ function loupe_numeric_compare (a, b) {
 	return 0;
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.numeric = {
 	
 	add: loupe_numeric_add,
@@ -1059,8 +1050,9 @@ loupe_cls(loupe, {
 });
 // Source: src/engines/svg/shape.js
 var loupe_shape_svg_map = {
-	stroke: 'stroke-width',
-	strokeColor: 'stroke',
+	stroke: 'stroke',
+	strokeWidth: 'stroke-width',
+	'stroke-width': 'stroke-width',
 	color: 'fill',
 	fill: 'fill',
 	transform: 'transform',

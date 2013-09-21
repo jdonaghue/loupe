@@ -113,11 +113,9 @@ function loupe_hex_to_rgb_values (hex) {
 	return [r,g,b];
 }
 
-loupe_extend(loupe, {
 
-	math: loupe.math || {}
-});
 
+loupe.math = loupe.math || {};
 loupe.math.color = {
 	
 	add: loupe_color_add,

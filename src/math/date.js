@@ -18,11 +18,7 @@ function loupe_date_compare (a, b) {
 	
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.date = {
 	
 	add: loupe_date_add,

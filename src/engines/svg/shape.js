@@ -1,6 +1,7 @@
 var loupe_shape_svg_map = {
-	stroke: 'stroke-width',
-	strokeColor: 'stroke',
+	stroke: 'stroke',
+	strokeWidth: 'stroke-width',
+	'stroke-width': 'stroke-width',
 	color: 'fill',
 	fill: 'fill',
 	transform: 'transform',

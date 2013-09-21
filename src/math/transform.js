@@ -70,11 +70,7 @@ function loupe_transform_math(d, dx, op) {
 	return type + '(' + body.join(',') + ')';
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.transform = {
 	
 	add: loupe_transform_add,

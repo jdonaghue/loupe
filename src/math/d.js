@@ -114,11 +114,7 @@ function loupe_d_math (d, dx, op) {
 	return d;
 }
 
-loupe_extend(loupe, {
-
-	math: loupe.math || {}
-});
-
+loupe.math = loupe.math || {};
 loupe.math.d = {
 	
 	add: loupe_d_add,

@@ -4,6 +4,7 @@ function loupe_get_add (type) {
 		case 'd': {
 			return loupe_d_add;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_add;	
 		} 
@@ -22,6 +23,7 @@ function loupe_get_sub (type) {
 		case 'd': {
 			return loupe_d_sub;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_sub;	
 		}
@@ -40,6 +42,7 @@ function loupe_get_mult (type) {
 		case 'd': {
 			return loupe_d_mult;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_mult;	
 		}
@@ -58,6 +61,7 @@ function loupe_get_divide (type) {
 		case 'd': {
 			return loupe_d_divide;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_divide;	
 		}
@@ -76,6 +80,7 @@ function loupe_get_compare (type) {
 		case 'd': {
 			return loupe_d_compare;
 		}
+		case 'stroke':
 		case 'fill': {
 			return loupe_color_compare;	
 		}

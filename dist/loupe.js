@@ -193,10 +193,8 @@ function loupe_get_add (type) {
 		case 'transform': {
 			return loupe_transform_add
 		}	
-		default: {
-			return loupe_numeric_add;
-		}
 	}
+	return loupe_numeric_add;
 }
 
 function loupe_get_sub (type) {
@@ -212,10 +210,8 @@ function loupe_get_sub (type) {
 		case 'transform': {
 			return loupe_transform_sub;
 		}	
-		default: {
-			return loupe_numeric_sub;
-		}
 	}
+	return loupe_numeric_sub;
 }
 
 function loupe_get_mult (type) {
@@ -231,10 +227,8 @@ function loupe_get_mult (type) {
 		case 'transform': {
 			return loupe_transform_mult;
 		}	
-		default: {
-			return loupe_numeric_mult;
-		}
 	}
+	return loupe_numeric_mult;
 }
 
 function loupe_get_divide (type) {
@@ -250,10 +244,8 @@ function loupe_get_divide (type) {
 		case 'transform': {
 			return loupe_transform_divide;
 		}	
-		default: {
-			return loupe_numeric_divide;
-		}
 	}
+	return loupe_numeric_divide;
 }
 
 function loupe_get_compare (type) {
@@ -268,11 +260,9 @@ function loupe_get_compare (type) {
 		}
 		case 'transform': {
 			return loupe_transform_compare;
-		}	
-		default: {
-			return loupe_numeric_compare;
 		}
 	}
+	return loupe_numeric_compare;
 }
 // Source: src/math/d.js
 function loupe_d_add (d, dx) {
@@ -975,17 +965,18 @@ loupe_extend(loupe, {
 // Source: src/transformations/linear.js
 function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, opts, engine, index) {
 
-	var map;
+	var map,
+		existingTransform = loupe[shape._tag + 'Transform'];
 
 	if (loupe_is_function(opts)) {
 		loupe_extend(shape, opts(self, shape, prevShape, data, analyzed_data, index), true);
 	}
-	else if (loupe[shape._tag + 'Transform']) {
-		loupe_extend(shape, loupe[shape._tag + 'Transform'](self, shape, prevShape, data, analyzed_data, index), true);
+	else if (existingTransform) {
+		loupe_extend(shape, existingTransform(self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else { 
 		loupe_each(opts, function(fn, key) {
-			map = loupe_get_map(shape.tag);
+			map = shape.map;
 
 			var shapeVal,
 				property;
@@ -1086,6 +1077,8 @@ loupe.extend(loupe, {
 	shape: function(shape, props, map, special, after) {
 
 		var self = this;
+
+		shape.map = map;
 
 		for (var prop in props) {
 			var mapped_prop = map[prop];
@@ -1367,32 +1360,6 @@ loupe_cls(loupe, {
 	}
 });
 // Source: src/engines/svg/svg.js
-function loupe_get_map (type) {
-	switch(type) {
-		case 'circle': {
-			return loupe_circle_svg_map;
-		}
-		case 'rect': {
-			return loupe_rect_svg_map;	
-		}
-		case 'path': {
-			return loupe_path_svg_map;
-		}
-		case 'line': {
-			return loupe_line_svg_map;
-		}
-		case 'polygon': {
-			return loupe_polygon_svg_map;
-		}
-		case 'polyline': {
-			return loupe_polyline_svg_map;
-		}
-		case 'text': {
-			return loupe_text_svg_map;
-		}
-	}
-}
-
 loupe_cls(loupe, {
 
 	draw_svg: function (animate) {

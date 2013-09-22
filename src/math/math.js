@@ -11,10 +11,8 @@ function loupe_get_add (type) {
 		case 'transform': {
 			return loupe_transform_add
 		}	
-		default: {
-			return loupe_numeric_add;
-		}
 	}
+	return loupe_numeric_add;
 }
 
 function loupe_get_sub (type) {
@@ -30,10 +28,8 @@ function loupe_get_sub (type) {
 		case 'transform': {
 			return loupe_transform_sub;
 		}	
-		default: {
-			return loupe_numeric_sub;
-		}
 	}
+	return loupe_numeric_sub;
 }
 
 function loupe_get_mult (type) {
@@ -49,10 +45,8 @@ function loupe_get_mult (type) {
 		case 'transform': {
 			return loupe_transform_mult;
 		}	
-		default: {
-			return loupe_numeric_mult;
-		}
 	}
+	return loupe_numeric_mult;
 }
 
 function loupe_get_divide (type) {
@@ -68,10 +62,8 @@ function loupe_get_divide (type) {
 		case 'transform': {
 			return loupe_transform_divide;
 		}	
-		default: {
-			return loupe_numeric_divide;
-		}
 	}
+	return loupe_numeric_divide;
 }
 
 function loupe_get_compare (type) {
@@ -86,9 +78,7 @@ function loupe_get_compare (type) {
 		}
 		case 'transform': {
 			return loupe_transform_compare;
-		}	
-		default: {
-			return loupe_numeric_compare;
 		}
 	}
+	return loupe_numeric_compare;
 }

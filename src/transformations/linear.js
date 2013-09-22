@@ -1,16 +1,17 @@
 function loupe_linear_transform (self, shape, prevShape, data, analyzed_data, opts, engine, index) {
 
-	var map;
+	var map,
+		existingTransform = loupe[shape._tag + 'Transform'];
 
 	if (loupe_is_function(opts)) {
 		loupe_extend(shape, opts(self, shape, prevShape, data, analyzed_data, index), true);
 	}
-	else if (loupe[shape._tag + 'Transform']) {
-		loupe_extend(shape, loupe[shape._tag + 'Transform'](self, shape, prevShape, data, analyzed_data, index), true);
+	else if (existingTransform) {
+		loupe_extend(shape, existingTransform(self, shape, prevShape, data, analyzed_data, index), true);
 	}
 	else { 
 		loupe_each(opts, function(fn, key) {
-			map = loupe_get_map(shape.tag);
+			map = shape.map;
 
 			var shapeVal,
 				property;

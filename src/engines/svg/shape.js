@@ -19,6 +19,8 @@ loupe.extend(loupe, {
 
 		var self = this;
 
+		shape.map = map;
+
 		for (var prop in props) {
 			var mapped_prop = map[prop];
 			if (special && prop in special) {

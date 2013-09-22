@@ -1,29 +1,3 @@
-function loupe_get_map (type) {
-	switch(type) {
-		case 'circle': {
-			return loupe_circle_svg_map;
-		}
-		case 'rect': {
-			return loupe_rect_svg_map;	
-		}
-		case 'path': {
-			return loupe_path_svg_map;
-		}
-		case 'line': {
-			return loupe_line_svg_map;
-		}
-		case 'polygon': {
-			return loupe_polygon_svg_map;
-		}
-		case 'polyline': {
-			return loupe_polyline_svg_map;
-		}
-		case 'text': {
-			return loupe_text_svg_map;
-		}
-	}
-}
-
 loupe_cls(loupe, {
 
 	draw_svg: function (animate) {

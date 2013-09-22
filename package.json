@@ -1,16 +1,16 @@
 {
-  "name": "angularjs-charts",
-  "title": "AngularJS Charts",
+  "name": "loupe",
+  "title": "Loupe",
   "description": "",
   "version": "0.0.1",
-  "homepage": "https://github.com/jdonaghue/angularjs-charts",
+  "homepage": "https://github.com/jdonaghue/loupe",
   "author": {
     "name": "James Donaghue",
     "url": "http://spectaclelabs.io"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/jdonaghue/angularjs-charts.git"
+    "url": "https://github.com/jdonaghue/loupe.git"
   },
   "licenses": [
     {

@@ -11,4 +11,4 @@ function loupe_extend(a, b, overwrite) {
 loupe_extend(loupe, {
 
 	override: loupe_extend
-})
+});

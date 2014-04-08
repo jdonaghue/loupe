@@ -305,6 +305,9 @@ function loupe_d_math (d, dx, op) {
 			for(var i=0, len=args.length; i<len; i++) {
 				var tmp = args[i].split(/,|\s/g),
 					operator = tmpOperations.shift().toUpperCase();
+
+				tmp.shift();
+				tmp.pop();
 				
 				for(var j=0; j<tmp.length; j++) {
 					if (op == 'add') {
@@ -327,9 +330,6 @@ function loupe_d_math (d, dx, op) {
 				args[i] = tmp.join(',');
 			}
 		}
-		else if (dx.x && dx.y) {
-
-		}
 		else {
 			var argsDx = dx.split(/[a-zA-Z]+/g),
 				operationsDx = dx.split(/[0-9, .\-]+/g);
@@ -346,17 +346,21 @@ function loupe_d_math (d, dx, op) {
 					tmpDx = argsDx[i].split(/,|\s/g),
 					operator = tmpOperations.shift().toUpperCase();
 
-				if (tmp.length != tmpDx.length) {
-					return d;
-				}
+				tmp.shift();
+				tmp.pop();
+
+				tmpDx.shift();
+				tmpDx.pop();
 
 				for(var j=0; j<tmp.length; j++) {
+					tmpDx[j] = (tmpDx[j] || 0) * 1;
+					tmp[j] = tmp[j] *1;
 
 					if (op == 'add') {
-						tmp[j] = (tmp[j] *1) + (tmpDx[j] *1);
+						tmp[j] = tmp[j] + tmpDx[j];
 					}
 					else if (op == 'sub') {
-						tmp[j] = (tmp[j] *1) - (tmpDx[j] *1);
+						tmp[j] = tmp[j] - tmpDx[j];
 					}
 					else if (op == 'mult') {
 						tmp[j] = tmp[j] * tmpDx[j];
